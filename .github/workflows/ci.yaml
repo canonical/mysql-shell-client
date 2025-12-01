@@ -1,0 +1,106 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+name: Tests
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v5
+      - name: "Install binaries"
+        run: |
+          sudo apt update
+          sudo apt install mysql-shell
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: "Install poetry & tox"
+        run: |
+          pipx install poetry
+          pipx install tox
+      - name: "Run linters"
+        run: tox run -e lint
+
+  test-unit:
+    name: "Run unit tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v5
+      - name: "Install binaries"
+        run: |
+          sudo apt update
+          sudo apt install mysql-shell
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: "Install poetry & tox"
+        run: |
+          pipx install poetry
+          pipx install tox
+      - name: "Run tests"
+        run: tox run -e unit
+      - name: "Upload Coverage to Codecov"
+        uses: codecov/codecov-action@v5
+
+  test-integration:
+    name: "Run integration tests"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        server_version:
+          - "8.0"
+          # - "8.4"
+        shell_version:
+          - "8.0.43+dfsg-0ubuntu0.24.04.1~ppa1"
+          # - "8.4.7+dfsg-0ubuntu0.24.04.1~ppa1"
+    env:
+      MYSQL_DATABASE: test
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: root_pass
+      MYSQL_SHELL_PATH: mysqlsh
+    services:
+      mysql:
+        image: mysql:${{ matrix.server_version }}
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
+          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v5
+      - name: "Install binaries"
+        run: |
+          sudo add-apt-repository ppa:data-platform/mysql-shell
+          sudo apt update
+          sudo apt install mysql-shell=${{ matrix.shell_version }}
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: "Install poetry & tox"
+        run: |
+          pipx install poetry
+          pipx install tox
+      - name: "Run tests"
+        run: tox run -e integration
+      - name: "Upload Coverage to Codecov"
+        uses: codecov/codecov-action@v5
