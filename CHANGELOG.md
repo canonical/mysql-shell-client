@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Added
+- Complete error message to the LocalExecutor raised exception
 ### Fixed
 - Possible password leak in LocalExecutor traceback info.
 

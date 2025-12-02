@@ -44,6 +44,19 @@ class LocalExecutor(BaseExecutor):
         """Return the connection details."""
         return self._conn_details
 
+    @staticmethod
+    def _parse_output(output: str) -> str | dict:
+        """Parse the error message."""
+        # MySQL Shell always prompts for the user password
+        output = output.split("\n")[1]
+
+        try:
+            message = json.loads(output)
+        except json.JSONDecodeError:
+            return output
+        else:
+            return message
+
     def check_connection(self) -> None:
         """Check the connection."""
         command = [
@@ -55,12 +68,13 @@ class LocalExecutor(BaseExecutor):
             subprocess.check_output(
                 command,
                 input=self._conn_details.password,
+                stderr=subprocess.STDOUT,
                 text=True,
             )
-        except subprocess.CalledProcessError:
-            raise ExecutionError("MySQL Shell failed to execute")
+        except subprocess.CalledProcessError as exc:
+            raise ExecutionError(f"MySQL Shell failed: {self._parse_output(exc.output)}")
         except subprocess.TimeoutExpired:
-            raise ExecutionError("MySQL Shell timed out")
+            raise ExecutionError(f"MySQL Shell timed out")
 
     def execute_py(self, script: str, *, timeout: int = 10) -> str:
         """Execute a Python script.
@@ -86,16 +100,17 @@ class LocalExecutor(BaseExecutor):
                 command,
                 timeout=timeout,
                 input=self._conn_details.password,
+                stderr=subprocess.STDOUT,
                 text=True,
             )
-        except subprocess.CalledProcessError:
-            raise ExecutionError("MySQL Shell failed to execute")
+        except subprocess.CalledProcessError as exc:
+            error = self._parse_output(exc.output)
+            error = error.get("error")
+            raise ExecutionError(f"MySQL Shell failed: {error}")
         except subprocess.TimeoutExpired:
-            raise ExecutionError("MySQL Shell timed out")
+            raise ExecutionError(f"MySQL Shell timed out")
         else:
-            # MySQL Shell always prompts for the user password
-            result = output.split("\n")[1]
-            result = json.loads(result)
+            result = self._parse_output(output)
             result = result.get("info", "")
             return result.strip()
 
@@ -122,15 +137,17 @@ class LocalExecutor(BaseExecutor):
                 command,
                 timeout=timeout,
                 input=self._conn_details.password,
+                stderr=subprocess.STDOUT,
                 text=True,
             )
-        except subprocess.CalledProcessError:
-            raise ExecutionError("MySQL Shell failed to execute")
+        except subprocess.CalledProcessError as exc:
+            error = self._parse_output(exc.output)
+            error = error.get("error")
+            error = error.get("message")
+            raise ExecutionError(f"MySQL Shell failed: {error}")
         except subprocess.TimeoutExpired:
-            raise ExecutionError("MySQL Shell timed out")
+            raise ExecutionError(f"MySQL Shell timed out")
         else:
-            # MySQL Shell always prompts for the user password
-            result = output.split("\n")[1]
-            result = json.loads(result)
+            result = self._parse_output(output)
             result = result.get("rows", [])
             return result

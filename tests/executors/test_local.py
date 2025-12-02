@@ -7,6 +7,7 @@ import os
 import pytest
 
 from mysql_shell.executors import LocalExecutor
+from mysql_shell.executors.errors import ExecutionError
 
 from ..helpers import build_local_executor
 
@@ -27,6 +28,22 @@ class TestLocalExecutor:
         """Check the connection."""
         executor.check_connection()
 
+    def test_check_connection_error(self, executor: LocalExecutor):
+        """Check the connection when there is an error."""
+        executor = build_local_executor(
+            username="wrong_username",
+            password="wrong_password",
+        )
+
+        try:
+            executor.check_connection()
+        except ExecutionError as e:
+            assert (
+                str(e)
+                .removeprefix("MySQL Shell failed: ")
+                .startswith("MySQL Error 1045 (28000): Access denied for user")
+            )
+
     def test_execute_py(self, executor: LocalExecutor):
         """Test the execution of Python scripts."""
         result = executor.execute_py("print('hello world')")
@@ -41,6 +58,13 @@ class TestLocalExecutor:
         assert result["class"] == "ClassicSession"
         assert result["connected"]
 
+    def test_execute_py_error(self, executor: LocalExecutor):
+        """Test the execution of Python scripts when there is an error."""
+        try:
+            executor.execute_py("syntax")
+        except ExecutionError as e:
+            assert str(e).removeprefix("MySQL Shell failed: ") == ""
+
     def test_execute_sql(self, executor: LocalExecutor):
         """Test the execution of SQL scripts."""
         rows = executor.execute_sql("SELECT 1")
@@ -50,3 +74,14 @@ class TestLocalExecutor:
         rows = executor.execute_sql("SELECT user FROM mysql.user")
         assert isinstance(rows, list)
         assert any(row["user"] == "root" for row in rows)
+
+    def test_execute_sql_error(self, executor: LocalExecutor):
+        """Test the execution of SQL scripts when there is an error."""
+        try:
+            executor.execute_sql("SELECT")
+        except ExecutionError as e:
+            assert (
+                str(e)
+                .removeprefix("MySQL Shell failed: ")
+                .startswith("You have an error in your SQL syntax")
+            )
