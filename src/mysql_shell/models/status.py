@@ -15,6 +15,21 @@ class ClusterSetStatus(str, Enum):
     UNAVAILABLE = "UNAVAILABLE"
 
 
+class ClusterSetClusterStatus(str, Enum):
+    """MySQL cluster-set cluster statuses.
+
+    https://dev.mysql.com/doc/mysql-shell/8.0/en/innodb-clusterset-status.html
+    """
+
+    OK = "OK"
+    OK_NOT_REPLICATING = "OK_NOT_REPLICATING"
+    OK_NOT_CONSISTENT = "OK_NOT_CONSISTENT"
+    OK_MISCONFIGURED = "OK_MISCONFIGURED"
+    NOT_OK = "NOT_OK"
+    UNKNOWN = "UNKNOWN"
+    INVALIDATED = "INVALIDATED"
+
+
 class ClusterStatus(str, Enum):
     """MySQL cluster statuses.
 
