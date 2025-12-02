@@ -9,8 +9,12 @@ from mysql_shell.builders import CharmAuthorizationQueryBuilder
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.executors.errors import ExecutionError
 from mysql_shell.models.account import Role
+from mysql_shell.models.statement import VariableScope
 
-from ...helpers import build_local_executor
+from ...helpers import (
+    build_local_executor,
+    temp_variable_value,
+)
 
 
 @pytest.mark.integration
@@ -22,7 +26,7 @@ class TestCharmAuthorizationQueryBuilder:
     TABLE_INSERT_QUERY = "INSERT INTO test.roles (name) VALUES ('new-role')"
     TABLE_SELECT_QUERY = "SELECT name FROM test.roles"
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture(scope="class", autouse=True)
     def executor(self):
         """Local executor fixture."""
         return build_local_executor(
@@ -30,14 +34,11 @@ class TestCharmAuthorizationQueryBuilder:
             password=os.environ["MYSQL_PASSWORD"],
         )
 
-    @pytest.fixture(scope="class")
-    def config(self, executor: LocalExecutor):
+    @pytest.fixture(scope="class", autouse=True)
+    def config(self):
         """Database config fixture."""
-        try:
-            executor.execute_sql("SET @@GLOBAL.activate_all_roles_on_login = 'ON'")
+        with temp_variable_value(VariableScope.GLOBAL, "activate_all_roles_on_login", "ON"):
             yield
-        finally:
-            executor.execute_sql("SET @@GLOBAL.activate_all_roles_on_login = 'OFF'")
 
     @staticmethod
     def _delete_role(executor: LocalExecutor, role: Role):
@@ -50,7 +51,6 @@ class TestCharmAuthorizationQueryBuilder:
 
         executor.execute_sql(query)
 
-    @pytest.mark.usefixtures("config")
     def test_instance_auth_roles_query(self, executor: LocalExecutor):
         """Test the creation of instance auth roles."""
         builder = CharmAuthorizationQueryBuilder(
@@ -129,7 +129,6 @@ class TestCharmAuthorizationQueryBuilder:
             self._delete_role(executor, Role("role_reader"))
             self._delete_role(executor, Role("role_writer"))
 
-    @pytest.mark.usefixtures("config")
     def test_database_admin_role_query(self, executor: LocalExecutor):
         """Test the creation of a database admin role."""
         builder = CharmAuthorizationQueryBuilder(
