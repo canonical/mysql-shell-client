@@ -274,6 +274,27 @@ class MySQLClusterClient:
             logger.error(f"Failed to force quorum into cluster {cluster_name}")
             raise
 
+    def rejoin_instance_into_cluster(
+        self,
+        cluster_name: str,
+        instance_host: str,
+        instance_port: str,
+        options: Options = None,
+    ) -> None:
+        """Rejoins an instance back into its InnoDB cluster."""
+        address = f"{instance_host}:{instance_port}"
+        command = f"\n".join((
+            f"cluster = dba.get_cluster('{cluster_name}')",
+            f"cluster.rejoin_instance('{address}', {options})",
+        ))
+
+        try:
+            logger.debug(f"Rejoining instance {address} into cluster {cluster_name}")
+            self._executor.execute_py(command)
+        except ExecutionError:
+            logger.error(f"Failed to rejoin instance {address} into cluster {cluster_name}")
+            raise
+
     def check_instance_before_cluster(
         self,
         instance_host: str,
