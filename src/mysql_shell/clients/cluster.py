@@ -341,6 +341,34 @@ class MySQLClusterClient:
             logger.error(f"Failed to setup instance {address} config")
             raise
 
+    def promote_instance_within_cluster(
+        self,
+        cluster_name: str,
+        instance_host: str,
+        instance_port: str,
+        force: bool = False,
+    ) -> None:
+        """Promotes an InnoDB cluster replica within the cluster."""
+        address = f"{instance_host}:{instance_port}"
+
+        if force:
+            logger.warning(f"Forcing instance {address} to become primary")
+            method_name = "force_primary_instance"
+        else:
+            logger.debug(f"Setting instance {address} to become primary")
+            method_name = "set_primary_instance"
+
+        command = "\n".join((
+            f"cluster = dba.get_cluster('{cluster_name}')",
+            f"cluster.{method_name}('{address}')",
+        ))
+
+        try:
+            self._executor.execute_py(command)
+        except ExecutionError:
+            logger.error(f"Failed to make instance {address} the primary")
+            raise
+
     def update_instance_within_cluster(
         self,
         cluster_name: str,
