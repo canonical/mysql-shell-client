@@ -274,9 +274,30 @@ class MySQLClusterClient:
             logger.error(f"Failed to force quorum into cluster {cluster_name}")
             raise
 
+    def check_instance_before_cluster(
+        self,
+        instance_host: str,
+        instance_port: str,
+        options: Options = None,
+    ) -> dict:
+        """Checks for an instance configuration before joining an InnoDB cluster."""
+        address = f"{instance_host}:{instance_port}"
+        command = f"\n".join((
+            f"result = dba.check_instance_configuration('{address}', {options})",
+            f"print(result)",
+        ))
+
+        try:
+            logger.debug(f"Checking for instance {address} config")
+            result = self._executor.execute_py(command)
+        except ExecutionError:
+            logger.error(f"Failed to check for instance {address} config")
+            raise
+        else:
+            return json.loads(result)
+
     def setup_instance_before_cluster(
         self,
-        cluster_name: str,
         instance_host: str,
         instance_port: str,
         options: Options = None,
@@ -293,10 +314,10 @@ class MySQLClusterClient:
         command = f"dba.configure_instance('{address}', {options})"
 
         try:
-            logger.debug(f"Setting up instance {address} within cluster {cluster_name}")
+            logger.debug(f"Setting up instance {address} config")
             self._executor.execute_py(command)
         except ExecutionError:
-            logger.error(f"Failed to setup instance {address} within cluster {cluster_name}")
+            logger.error(f"Failed to setup instance {address} config")
             raise
 
     def update_instance_within_cluster(
