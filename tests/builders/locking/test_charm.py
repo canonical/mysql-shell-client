@@ -56,6 +56,25 @@ class TestCharmLockingQueryBuilder:
         assert locks
         assert locks[0]["COUNT(*)"] == len(CharmLockingQueryBuilder.TASKS)
 
+    def test_fetch_acquired_lock_query(self, executor: LocalExecutor):
+        """Test the fetching for acquired table locks."""
+        builder = CharmLockingQueryBuilder("mysql", "locking")
+        task = CharmLockingQueryBuilder.INSTANCE_ADDITION_TASK
+        query = builder.build_fetch_acquired_query(task)
+
+        locks = executor.execute_sql(query)
+        assert len(locks) == 0
+
+        try:
+            acquire_query = builder.build_acquire_query(task, "mysql-1")
+            executor.execute_sql(acquire_query)
+
+            locks = executor.execute_sql(query)
+            assert len(locks) == 1
+        finally:
+            release_query = builder.build_release_query(task, "mysql-1")
+            executor.execute_sql(release_query)
+
     def test_acquire_lock_query(self, executor: LocalExecutor):
         """Test the acquiring of the table lock."""
         builder = CharmLockingQueryBuilder("mysql", "locking")

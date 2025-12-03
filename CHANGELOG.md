@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Added
+- Lock fetching method to LockQueryBuilder classes.
 - Instance-promote method to ClusterClient class.
 - Instance-rejoin method to ClusterClient class.
 - Instance-check method to ClusterClient class.

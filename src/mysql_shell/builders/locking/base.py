@@ -13,6 +13,11 @@ class BaseLockingQueryBuilder(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def build_fetch_acquired_query(self, task: str) -> str:
+        """Builds the acquired lock check query."""
+        raise NotImplementedError()
+
+    @abstractmethod
     def build_acquire_query(self, task: str, instance: str) -> str:
         """Builds the lock acquiring query."""
         raise NotImplementedError()
