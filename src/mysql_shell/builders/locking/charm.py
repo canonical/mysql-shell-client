@@ -50,6 +50,16 @@ class CharmLockingQueryBuilder(BaseLockingQueryBuilder):
             *insert_queries,
         ))
 
+    def build_fetch_acquired_query(self, task: str) -> str:
+        """Builds the acquired lock fetch query."""
+        query = "SELECT executor FROM {table} WHERE task = {task} AND status = {status}"
+
+        return query.format(
+            table=self._table,
+            task=self._quoter.quote_value(task),
+            status=self._quoter.quote_value("in-progress"),
+        )
+
     def build_acquire_query(self, task: str, instance: str) -> str:
         """Builds the lock acquiring query."""
         if task not in self.TASKS:
