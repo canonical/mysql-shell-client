@@ -5,29 +5,35 @@ import os
 
 import pytest
 
-from mysql_shell import VariableScope
 from mysql_shell.builders import StringQueryQuoter
 from mysql_shell.clients import MySQLInstanceClient
+from mysql_shell.executors import LocalExecutor
 from mysql_shell.models.account import Role, User
-from mysql_shell.models.statement import LogType
+from mysql_shell.models.statement import LogType, VariableScope
+from mysql_shell.models.status import InstanceRole, InstanceStatus
 
-from ..helpers import build_local_executor
+from ..helpers import (
+    build_local_executor,
+    temp_variable_value,
+)
 
 
 @pytest.mark.integration
 class TestInstanceClient:
     """Class to group all the MySQLInstanceClient tests."""
 
-    @pytest.fixture(scope="class")
-    def client(self):
-        """MySQL Instance client fixture."""
-        quoter = StringQueryQuoter()
-        executor = build_local_executor(
+    @pytest.fixture(scope="class", autouse=True)
+    def executor(self):
+        """Local executor fixture."""
+        return build_local_executor(
             username=os.environ["MYSQL_USERNAME"],
             password=os.environ["MYSQL_PASSWORD"],
         )
 
-        return MySQLInstanceClient(executor, quoter)
+    @pytest.fixture(scope="class", autouse=True)
+    def client(self, executor: LocalExecutor):
+        """MySQL Instance client fixture."""
+        return MySQLInstanceClient(executor, StringQueryQuoter())
 
     @staticmethod
     def _delete_user(client: MySQLInstanceClient, user: User):
@@ -182,11 +188,11 @@ class TestInstanceClient:
 
     def test_get_instance_replication_state(self, client: MySQLInstanceClient):
         """Test the fetching of the instance replication state."""
-        pass
+        assert client.get_instance_replication_state() == InstanceStatus.ONLINE
 
     def test_get_instance_replication_role(self, client: MySQLInstanceClient):
         """Test the fetching of the instance replication role."""
-        pass
+        assert client.get_instance_replication_role() == InstanceRole.PRIMARY
 
     def test_get_instance_variable(self, client: MySQLInstanceClient):
         """Test the fetching of an instance variable."""
@@ -194,22 +200,21 @@ class TestInstanceClient:
 
     def test_set_instance_variable(self, client: MySQLInstanceClient):
         """Test the fetching of an instance variable."""
-        prev_value = client.get_instance_variable(VariableScope.GLOBAL, "max_connections")
+        var_name = "max_connections"
+        var_value = 100
 
-        try:
-            _ = client.set_instance_variable(VariableScope.GLOBAL, "max_connections", 100)
-            v = client.get_instance_variable(VariableScope.GLOBAL, "max_connections")
-            assert v == 100
-        finally:
-            client.set_instance_variable(VariableScope.GLOBAL, "max_connections", prev_value)
+        with temp_variable_value(VariableScope.GLOBAL, var_name, var_value):
+            assert client.get_instance_variable(VariableScope.GLOBAL, var_name) == var_value
 
     def test_install_plugin(self, client: MySQLInstanceClient):
         """Test the installation of an instance plugin."""
+        plugins = client.search_instance_plugins("%")
+        assert "auth_socket" not in plugins
+
         try:
             client.install_instance_plugin("auth_socket", "auth_socket.so")
 
             plugins = client.search_instance_plugins("%")
-            assert len(plugins) == 1
             assert "auth_socket" in plugins
         finally:
             client.uninstall_instance_plugin("auth_socket")
@@ -227,7 +232,8 @@ class TestInstanceClient:
     def test_search_instance_plugins(self, client: MySQLInstanceClient):
         """Test the searching of instance plugins given a name-pattern."""
         plugins = client.search_instance_plugins("%")
-        assert len(plugins) == 0
+        assert "clone" in plugins
+        assert "group_replication" in plugins
 
     def test_search_instance_roles(self, client: MySQLInstanceClient):
         """Test the searching of instance roles given a name-pattern."""

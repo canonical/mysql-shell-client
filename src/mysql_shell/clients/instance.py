@@ -206,7 +206,7 @@ class MySQLInstanceClient:
             logger.error("Failed to get instance replication state")
             raise
         else:
-            return InstanceStatus(rows[0]["MEMBER_STATE"])
+            return InstanceStatus(rows[0]["member_state"])
 
     def get_instance_replication_role(self) -> InstanceRole:
         """Gets the instance replication role."""
@@ -222,7 +222,7 @@ class MySQLInstanceClient:
             logger.error("Failed to get instance replication role")
             raise
         else:
-            return InstanceRole(rows[0]["MEMBER_ROLE"])
+            return InstanceRole(rows[0]["member_role"])
 
     def get_instance_variable(self, scope: VariableScope, name: str) -> Any:
         """Gets an instance variable by scope and name."""

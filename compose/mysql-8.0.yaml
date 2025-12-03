@@ -7,12 +7,6 @@ services:
     platform: linux/amd64
     ports:
       - "3306:3306"
-    command:
-      - "mysqld"
-      - "--binlog_transaction_dependency_tracking=WRITESET"
-      - "--enforce_gtid_consistency=ON"
-      - "--gtid_mode=ON"
-      - "--server_id=1"
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
