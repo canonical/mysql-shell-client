@@ -53,7 +53,7 @@ class MySQLClusterClient:
         ))
 
         try:
-            result = self._executor.execute_py(command)
+            result = self._executor.execute_py(command, timeout=30)
         except ExecutionError:
             logger.error("Failed to fetch cluster status")
             raise
@@ -115,7 +115,7 @@ class MySQLClusterClient:
         ))
 
         try:
-            result = self._executor.execute_py(command)
+            result = self._executor.execute_py(command, timeout=120)
         except ExecutionError:
             logger.error("Failed to fetch cluster set status")
             raise
