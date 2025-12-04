@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Added
+- Process search method to InstanceClient class
+- Reload TLS method to InstanceClient class.
+- Check work method to InstanceClient class.
 - Model to represent cluster roles.
 - Timeout to cluster / cluster-set status fetching.
 ### Fixed

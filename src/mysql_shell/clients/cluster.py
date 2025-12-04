@@ -90,6 +90,17 @@ class MySQLClusterClient:
             logger.error(f"Failed to re-scan cluster {cluster_name}")
             raise
 
+    def reboot_cluster(self, cluster_name: str, options: Options = None) -> None:
+        """Reboots an InnoDB cluster."""
+        command = f"dba.reboot_cluster_from_complete_outage('{cluster_name}', {options})"
+
+        try:
+            logger.debug(f"Re-booting InnoDB cluster {cluster_name}")
+            self._executor.execute_py(command)
+        except ExecutionError:
+            logger.error(f"Failed to re-boot cluster {cluster_name}")
+            raise
+
     def create_cluster_set(self, cluster_name: str, cluster_set_name: str) -> None:
         """Creates an InnoDB cluster set from the provided cluster."""
         command = "\n".join((

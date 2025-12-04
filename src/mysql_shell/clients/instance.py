@@ -25,6 +25,25 @@ class MySQLInstanceClient:
         self._executor = executor
         self._quoter = quoter
 
+    def check_work_ongoing(self, name_pattern: str) -> bool:
+        """Checks whether an instance work is ongoing."""
+        query = (
+            "SELECT work_completed, work_estimated "
+            "FROM performance_schema.events_stages_current "
+            "WHERE event_name LIKE {name_pattern}"
+        )
+        query = query.format(
+            name_pattern=self._quoter.quote_value(name_pattern),
+        )
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error(f"Failed to check work for events with {name_pattern=}")
+            raise
+        else:
+            return any(row["work_completed"] < row["work_estimated"] for row in rows)
+
     def create_instance_role(self, role: Role, roles: list[str] = None) -> None:
         """Creates a new instance role."""
         if not roles:
@@ -300,6 +319,35 @@ class MySQLInstanceClient:
             logger.error(f"Failed to uninstall instance plugin with {name=}")
             raise
 
+    def reload_instance_certs(self) -> None:
+        """Reloads TLS certificates."""
+        query = "ALTER INSTANCE RELOAD TLS"
+
+        try:
+            self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error("Failed to reload instance TLS certificates")
+            raise
+
+    def search_instance_connections(self, name_pattern: str) -> list[int]:
+        """Searches the instance connections by name pattern."""
+        query = (
+            "SELECT processlist_id "
+            "FROM performance_schema.threads "
+            "WHERE connection_type IS NOT NULL AND name LIKE {name_pattern}"
+        )
+        query = query.format(
+            name_pattern=self._quoter.quote_value(name_pattern),
+        )
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error(f"Failed to search instance connections with {name_pattern=}")
+            raise
+        else:
+            return [row["processlist_id"] for row in rows]
+
     def search_instance_databases(self, name_pattern: str) -> list[str]:
         """Searches the instance databases by name pattern."""
         query = (
@@ -408,4 +456,16 @@ class MySQLInstanceClient:
             self._executor.execute_sql(query)
         except ExecutionError:
             logger.error("Failed to stop instance replication")
+            raise
+
+    def stop_instance_processes(self, process_ids: list[int]) -> None:
+        """Kills the instances processes by ID."""
+        query = "KILL CONNECTION {id}"
+        queries = [query.format(id=self._quoter.quote_value(str(pid))) for pid in process_ids]
+        queries = ";".join(queries)
+
+        try:
+            self._executor.execute_sql(queries)
+        except ExecutionError:
+            logger.error("Failed to kill instance processes")
             raise

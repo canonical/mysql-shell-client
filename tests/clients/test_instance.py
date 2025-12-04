@@ -15,7 +15,8 @@ from mysql_shell.models.status import InstanceStatus
 
 from ..helpers import (
     build_local_executor,
-    temp_variable_value,
+    temp_process,
+    temp_variable,
 )
 
 
@@ -73,6 +74,22 @@ class TestInstanceClient:
         )
 
         return [row["from_user"] for row in client._executor.execute_sql(query)]
+
+    @staticmethod
+    def _get_processes(client: MySQLInstanceClient, info: str):
+        """Get the processes by statement."""
+        query = (
+            "SELECT processlist_id "
+            "FROM performance_schema.threads "
+            "WHERE processlist_info = '{info}'"
+        )
+        query = query.format(info=info)
+
+        return [row["processlist_id"] for row in client._executor.execute_sql(query)]
+
+    def test_check_work_ongoing(self, client: MySQLInstanceClient):
+        """Test the checking of instance work."""
+        assert not client.check_work_ongoing("%")
 
     def test_create_instance_role_without_roles(self, client: MySQLInstanceClient):
         """Test the creation of an instance role."""
@@ -204,7 +221,7 @@ class TestInstanceClient:
         var_name = "max_connections"
         var_value = 100
 
-        with temp_variable_value(VariableScope.GLOBAL, var_name, var_value):
+        with temp_variable(VariableScope.GLOBAL, var_name, var_value):
             assert client.get_instance_variable(VariableScope.GLOBAL, var_name) == var_value
 
     def test_install_plugin(self, client: MySQLInstanceClient):
@@ -219,6 +236,21 @@ class TestInstanceClient:
             assert "auth_socket" in plugins
         finally:
             client.uninstall_instance_plugin("auth_socket")
+
+    def test_reload_instance_certs(self, client: MySQLInstanceClient):
+        """Test the reloading of instance TLS certificates."""
+        pass
+
+    def test_search_instance_connections(self, client: MySQLInstanceClient):
+        """Test the searching of instance connections given a name-pattern."""
+        query = "DO SLEEP(10)"
+
+        with temp_process(query):
+            process_ids = self._get_processes(client, query)
+            assert len(process_ids) == 1
+
+            assert process_ids[0] in client.search_instance_connections("%")
+            assert process_ids[0] not in client.search_instance_connections("process_search")
 
     def test_search_instance_databases(self, client: MySQLInstanceClient):
         """Test the searching of instance databases given a name-pattern."""
@@ -272,10 +304,22 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, user)
 
-    def test_start_replication(self, client: MySQLInstanceClient):
+    def test_start_instance_replication(self, client: MySQLInstanceClient):
         """Test the starting of group replication."""
         pass
 
-    def test_stop_replication(self, client: MySQLInstanceClient):
+    def test_stop_instance_replication(self, client: MySQLInstanceClient):
         """Test the stopping of group replication."""
         pass
+
+    def test_stop_instance_processes(self, client: MySQLInstanceClient):
+        """Test the stopping of processes."""
+        query = "DO SLEEP(10)"
+
+        with temp_process(query):
+            process_ids = self._get_processes(client, query)
+            assert len(process_ids) == 1
+
+            assert process_ids[0] in client.search_instance_connections("%")
+            client.stop_instance_processes(process_ids)
+            assert process_ids[0] not in client.search_instance_connections("%")

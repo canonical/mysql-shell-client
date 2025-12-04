@@ -13,7 +13,7 @@ from mysql_shell.models.statement import VariableScope
 
 from ...helpers import (
     build_local_executor,
-    temp_variable_value,
+    temp_variable,
 )
 
 
@@ -37,7 +37,7 @@ class TestCharmAuthorizationQueryBuilder:
     @pytest.fixture(scope="class", autouse=True)
     def config(self):
         """Database config fixture."""
-        with temp_variable_value(VariableScope.GLOBAL, "activate_all_roles_on_login", "ON"):
+        with temp_variable(VariableScope.GLOBAL, "activate_all_roles_on_login", "ON"):
             yield
 
     @staticmethod
