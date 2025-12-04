@@ -64,10 +64,3 @@ class InstanceStatus(str, Enum):
     OFFLINE = "OFFLINE"
     ERROR = "ERROR"
     UNREACHABLE = "UNREACHABLE"
-
-
-class InstanceRole(str, Enum):
-    """MySQL instance roles."""
-
-    PRIMARY = "PRIMARY"
-    SECONDARY = "SECONDARY"

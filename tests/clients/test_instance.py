@@ -9,8 +9,9 @@ from mysql_shell.builders import StringQueryQuoter
 from mysql_shell.clients import MySQLInstanceClient
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models.account import Role, User
+from mysql_shell.models.roles import InstanceRole
 from mysql_shell.models.statement import LogType, VariableScope
-from mysql_shell.models.status import InstanceRole, InstanceStatus
+from mysql_shell.models.status import InstanceStatus
 
 from ..helpers import (
     build_local_executor,

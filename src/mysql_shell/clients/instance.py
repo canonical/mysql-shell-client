@@ -8,8 +8,9 @@ from ..builders import StringQueryQuoter
 from ..executors import BaseExecutor
 from ..executors.errors import ExecutionError
 from ..models.account import Role, User
+from ..models.roles import InstanceRole
 from ..models.statement import LogType, VariableScope
-from ..models.status import InstanceRole, InstanceStatus
+from ..models.status import InstanceStatus
 
 logger = logging.getLogger()
 
