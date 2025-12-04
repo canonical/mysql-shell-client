@@ -74,6 +74,10 @@ class TestInstanceClient:
 
         return [row["from_user"] for row in client._executor.execute_sql(query)]
 
+    def test_check_work_ongoing(self, client: MySQLInstanceClient):
+        """Test the checking of instance work."""
+        assert not client.check_work_ongoing("%")
+
     def test_create_instance_role_without_roles(self, client: MySQLInstanceClient):
         """Test the creation of an instance role."""
         role = Role("instance_role_create", "%")

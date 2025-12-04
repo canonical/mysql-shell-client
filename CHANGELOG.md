@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Added
+- Check work method to InstanceClient class.
 - Model to represent cluster roles.
 - Timeout to cluster / cluster-set status fetching.
 ### Fixed

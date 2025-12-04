@@ -25,6 +25,25 @@ class MySQLInstanceClient:
         self._executor = executor
         self._quoter = quoter
 
+    def check_work_ongoing(self, name_pattern: str) -> bool:
+        """Checks whether an instance work is ongoing."""
+        query = (
+            "SELECT work_completed, work_estimated "
+            "FROM performance_schema.events_stages_current "
+            "WHERE event_name LIKE {name_pattern}"
+        )
+        query = query.format(
+            name_pattern=self._quoter.quote_value(name_pattern),
+        )
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error(f"Failed to check work for events with {name_pattern=}")
+            raise
+        else:
+            return any(row["work_completed"] < row["work_estimated"] for row in rows)
+
     def create_instance_role(self, role: Role, roles: list[str] = None) -> None:
         """Creates a new instance role."""
         if not roles:
