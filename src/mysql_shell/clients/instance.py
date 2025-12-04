@@ -329,6 +329,25 @@ class MySQLInstanceClient:
             logger.error("Failed to reload instance TLS certificates")
             raise
 
+    def search_instance_connections(self, name_pattern: str) -> list[int]:
+        """Searches the instance connections by name pattern."""
+        query = (
+            "SELECT processlist_id "
+            "FROM performance_schema.threads "
+            "WHERE connection_type IS NOT NULL AND name LIKE {name_pattern}"
+        )
+        query = query.format(
+            name_pattern=self._quoter.quote_value(name_pattern),
+        )
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error(f"Failed to search instance connections with {name_pattern=}")
+            raise
+        else:
+            return [row["processlist_id"] for row in rows]
+
     def search_instance_databases(self, name_pattern: str) -> list[str]:
         """Searches the instance databases by name pattern."""
         query = (
@@ -437,4 +456,16 @@ class MySQLInstanceClient:
             self._executor.execute_sql(query)
         except ExecutionError:
             logger.error("Failed to stop instance replication")
+            raise
+
+    def stop_instance_processes(self, process_ids: list[int]) -> None:
+        """Kills the instances processes by ID."""
+        query = "KILL CONNECTION {id}"
+        queries = [query.format(id=self._quoter.quote_value(str(pid))) for pid in process_ids]
+        queries = ";".join(queries)
+
+        try:
+            self._executor.execute_sql(queries)
+        except ExecutionError:
+            logger.error("Failed to kill instance processes")
             raise

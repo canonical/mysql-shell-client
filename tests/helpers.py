@@ -2,6 +2,8 @@
 # See LICENSE file for licensing details.
 
 import os
+import threading
+import time
 from contextlib import contextmanager
 from typing import Any, Generator
 
@@ -25,7 +27,25 @@ def build_local_executor(username: str, password: str, host: str = "0.0.0.0", po
 
 
 @contextmanager
-def temp_variable_value(scope: VariableScope, name: str, value: Any) -> Generator:
+def temp_process(query: str):
+    """Context manager to run a piece of code with a background process."""
+    executor = build_local_executor(
+        username=os.environ["MYSQL_USERNAME"],
+        password=os.environ["MYSQL_PASSWORD"],
+    )
+
+    thread = threading.Thread(target=executor.execute_sql, args=[query])
+
+    try:
+        thread.start()
+        time.sleep(1)
+        yield
+    finally:
+        thread.join()
+
+
+@contextmanager
+def temp_variable(scope: VariableScope, name: str, value: Any) -> Generator:
     """Context manager to run a piece of code with a variable changed."""
     executor = build_local_executor(
         username=os.environ.get("MYSQL_USERNAME"),
