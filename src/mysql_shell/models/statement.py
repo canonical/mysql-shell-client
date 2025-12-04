@@ -26,3 +26,5 @@ class VariableScope(str, Enum):
 
     GLOBAL = "GLOBAL"
     SESSION = "SESSION"
+    PERSIST = "PERSIST"
+    PERSIST_ONLY = "PERSIST_ONLY"

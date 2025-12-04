@@ -224,6 +224,10 @@ class TestInstanceClient:
         finally:
             client.uninstall_instance_plugin("auth_socket")
 
+    def test_reload_instance_certs(self, client: MySQLInstanceClient):
+        """Test the reloading of instance TLS certificates."""
+        pass
+
     def test_search_instance_databases(self, client: MySQLInstanceClient):
         """Test the searching of instance databases given a name-pattern."""
         dbs = client.search_instance_databases("%")

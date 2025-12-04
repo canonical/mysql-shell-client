@@ -319,6 +319,16 @@ class MySQLInstanceClient:
             logger.error(f"Failed to uninstall instance plugin with {name=}")
             raise
 
+    def reload_instance_certs(self) -> None:
+        """Reloads TLS certificates."""
+        query = "ALTER INSTANCE RELOAD TLS"
+
+        try:
+            self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error("Failed to reload instance TLS certificates")
+            raise
+
     def search_instance_databases(self, name_pattern: str) -> list[str]:
         """Searches the instance databases by name pattern."""
         query = (
