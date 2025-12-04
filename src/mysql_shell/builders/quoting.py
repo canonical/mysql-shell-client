@@ -12,7 +12,7 @@ class StringQueryQuoter:
         """Escapes a string that can be used in a SQL statement.
 
         This function will only be used in the context of MySQL Shell,
-        so the recommended way to deal with SQL injection attacks,
+        as the recommended way to deal with SQL injection attacks
         (using parametrized queries) is not available.
 
         The code has been copied from the mysql-connector Python package.

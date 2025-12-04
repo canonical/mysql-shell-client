@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Added
+- Model to represent cluster roles.
+- Timeout to cluster / cluster-set status fetching.
+### Fixed
+- Invalid InstanceStatus enum value.
 
 ## [0.2.0][changes-0.2.0] - 2025-12-03
 ### Added

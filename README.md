@@ -54,7 +54,7 @@ in addition to a set of predefined queries to cover most of the common use-cases
    from mysql_shell.clients import MySQLClusterClient, MySQLInstanceClient
    
    cluster_client = MySQLClusterClient(cluster_executor)
-   instance_client = MySQLClusterClient(instance_executor)
+   instance_client = MySQLInstanceClient(instance_executor)
    ```
 
 
@@ -85,7 +85,7 @@ tox -e unit
 export MYSQL_DATABASE="test"
 export MYSQL_USERNAME="root"
 export MYSQL_PASSWORD="root_pass"
-export MYSQL_SHELL_PATH="..."
+export MYSQL_SHELL_PATH="mysqlsh"
 
 podman-compose -f compose/mysql-8.0.yaml up --detach && tox -e integration
 podman-compose -f compose/mysql-8.0.yaml down

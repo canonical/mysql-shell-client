@@ -3,5 +3,6 @@
 
 from .account import *
 from .connection import *
+from .roles import *
 from .statement import *
 from .status import *

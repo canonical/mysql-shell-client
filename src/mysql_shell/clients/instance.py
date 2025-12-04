@@ -8,8 +8,9 @@ from ..builders import StringQueryQuoter
 from ..executors import BaseExecutor
 from ..executors.errors import ExecutionError
 from ..models.account import Role, User
+from ..models.roles import InstanceRole
 from ..models.statement import LogType, VariableScope
-from ..models.status import InstanceRole, InstanceStatus
+from ..models.status import InstanceStatus
 
 logger = logging.getLogger()
 
@@ -173,7 +174,7 @@ class MySQLInstanceClient:
         else:
             return rows[0]["instance_name"]
 
-    def get_cluster_instance_labels(self, cluster_name: str) -> set[str]:
+    def get_cluster_instance_labels(self, cluster_name: str) -> list[str]:
         """Gets the instance labels within the cluster."""
         query = (
             "SELECT instance_name "
@@ -190,7 +191,7 @@ class MySQLInstanceClient:
             logger.error(f"Failed to get cluster instance labels with {cluster_name=}")
             raise
         else:
-            return {row["instance_name"] for row in rows}
+            return [row["instance_name"] for row in rows]
 
     def get_instance_replication_state(self) -> InstanceStatus:
         """Gets the instance replication state."""

@@ -15,8 +15,8 @@ class ClusterSetStatus(str, Enum):
     UNAVAILABLE = "UNAVAILABLE"
 
 
-class ClusterSetClusterStatus(str, Enum):
-    """MySQL cluster-set cluster statuses.
+class ClusterGlobalStatus(str, Enum):
+    """MySQL cluster statuses within a cluster-set context.
 
     https://dev.mysql.com/doc/mysql-shell/8.0/en/innodb-clusterset-status.html
     """
@@ -64,11 +64,3 @@ class InstanceStatus(str, Enum):
     OFFLINE = "OFFLINE"
     ERROR = "ERROR"
     UNREACHABLE = "UNREACHABLE"
-    UNKNOWN = "UNKNOWN"
-
-
-class InstanceRole(str, Enum):
-    """MySQL instance roles."""
-
-    PRIMARY = "PRIMARY"
-    SECONDARY = "SECONDARY"
