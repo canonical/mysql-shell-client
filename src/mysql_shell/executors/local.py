@@ -14,8 +14,7 @@ class LocalExecutor(BaseExecutor):
 
     def __init__(self, conn_details: ConnectionDetails, shell_path: str):
         """Initialize the executor."""
-        self._conn_details = conn_details
-        self._shell_path = shell_path
+        super().__init__(conn_details, shell_path)
 
     def _common_args(self) -> list[str]:
         """Return the list of common arguments."""
@@ -38,11 +37,6 @@ class LocalExecutor(BaseExecutor):
                 f"--port={self._conn_details.port}",
                 f"--user={self._conn_details.username}",
             ]
-
-    @property
-    def connection_details(self) -> ConnectionDetails:
-        """Return the connection details."""
-        return self._conn_details
 
     @staticmethod
     def _parse_output(output: str) -> str | dict:
