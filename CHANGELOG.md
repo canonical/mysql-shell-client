@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 
+## [0.4.0][changes-0.4.0] - 2025-12-10
+### Added
+- Get cluster labels method to InstanceClient class.
+- Search replication members method to InstanceClient class.
+
 ## [0.3.0][changes-0.3.0] - 2025-12-05
 ### Added
 - Process search method to InstanceClient class
@@ -38,5 +43,6 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 [changes-0.1.0]: https://github.com/canonical/mysql-shell-client/releases/tag/0.1.0
 [changes-0.2.0]: https://github.com/canonical/mysql-shell-client/compare/0.1.0...0.2.0
 [changes-0.3.0]: https://github.com/canonical/mysql-shell-client/compare/0.2.0...0.3.0
+[changes-0.4.0]: https://github.com/canonical/mysql-shell-client/compare/0.3.0...0.4.0
 [docs-changelog]: https://keepachangelog.com/en/1.0.0/
 [docs-semver]: https://semver.org/spec/v2.0.0.html
