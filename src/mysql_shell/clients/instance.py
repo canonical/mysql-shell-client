@@ -2,7 +2,7 @@
 # See LICENSE file for licensing details.
 
 import logging
-from typing import Any
+from typing import Any, Collection, Mapping
 
 from ..builders import StringQueryQuoter
 from ..executors import BaseExecutor
@@ -14,7 +14,9 @@ from ..models.status import InstanceStatus
 
 logger = logging.getLogger()
 
-Attributes = dict[str, str] | None
+_Attributes = Mapping[str, str] | None
+_OptionalRoles = Collection[InstanceRole] | None
+_OptionalStates = Collection[InstanceStatus] | None
 
 
 class MySQLInstanceClient:
@@ -212,6 +214,18 @@ class MySQLInstanceClient:
         else:
             return [row["instance_name"] for row in rows]
 
+    def get_cluster_labels(self) -> list[str]:
+        """Gets the cluster labels."""
+        query = "SELECT cluster_name FROM mysql_innodb_cluster_metadata.clusters"
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error("Failed to get cluster labels")
+            raise
+        else:
+            return [row["cluster_name"] for row in rows]
+
     def get_instance_replication_state(self) -> InstanceStatus:
         """Gets the instance replication state."""
         query = (
@@ -329,8 +343,37 @@ class MySQLInstanceClient:
             logger.error("Failed to reload instance TLS certificates")
             raise
 
+    def search_instance_replication_members(
+        self,
+        roles: _OptionalRoles = None,
+        states: _OptionalStates = None,
+    ) -> list[str]:
+        """Searches the instance replication member IDs by role and/ok state."""
+        if not roles:
+            roles = list(InstanceRole)
+        if not states:
+            states = list(InstanceStatus)
+
+        query = (
+            "SELECT member_id "
+            "FROM performance_schema.replication_group_members "
+            "WHERE member_role IN ({roles}) AND member_state IN ({states})"
+        )
+        query = query.format(
+            roles=", ".join([self._quoter.quote_value(role) for role in roles]),
+            states=", ".join([self._quoter.quote_value(state) for state in states]),
+        )
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error("Failed to search instance replication members")
+            raise
+        else:
+            return [row["member_id"] for row in rows]
+
     def search_instance_connections(self, name_pattern: str) -> list[int]:
-        """Searches the instance connections by name pattern."""
+        """Searches the instance connection IDs by name pattern."""
         query = (
             "SELECT processlist_id "
             "FROM performance_schema.threads "
@@ -408,7 +451,7 @@ class MySQLInstanceClient:
         else:
             return [Role.from_row(row["user"], row["host"]) for row in rows]
 
-    def search_instance_users(self, name_pattern: str, attrs: Attributes = None) -> list[User]:
+    def search_instance_users(self, name_pattern: str, attrs: _Attributes = None) -> list[User]:
         """Searches the instance users by name pattern and attributes."""
         attr_filter = "attribute LIKE {string}"
         attr_substr = '%"{key}": "{val}"%'
@@ -461,7 +504,7 @@ class MySQLInstanceClient:
     def stop_instance_processes(self, process_ids: list[int]) -> None:
         """Kills the instances processes by ID."""
         query = "KILL CONNECTION {id}"
-        queries = [query.format(id=self._quoter.quote_value(str(pid))) for pid in process_ids]
+        queries = [query.format(id=self._quoter.quote_value(pid)) for pid in process_ids]
         queries = ";".join(queries)
 
         try:
