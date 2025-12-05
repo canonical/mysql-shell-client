@@ -204,6 +204,12 @@ class TestInstanceClient:
         """Test the fetching of all the cluster instance labels."""
         pass
 
+    def test_get_cluster_labels(self, client: MySQLInstanceClient):
+        """Test the fetching of all the cluster labels."""
+        clusters = client.get_cluster_labels()
+        assert "default" not in clusters
+        assert "my-cluster" in clusters
+
     def test_get_instance_replication_state(self, client: MySQLInstanceClient):
         """Test the fetching of the instance replication state."""
         assert client.get_instance_replication_state() == InstanceStatus.ONLINE

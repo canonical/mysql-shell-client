@@ -212,6 +212,18 @@ class MySQLInstanceClient:
         else:
             return [row["instance_name"] for row in rows]
 
+    def get_cluster_labels(self) -> list[str]:
+        """Gets the cluster labels."""
+        query = "SELECT cluster_name FROM mysql_innodb_cluster_metadata.clusters"
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error("Failed to get cluster labels")
+            raise
+        else:
+            return [row["cluster_name"] for row in rows]
+
     def get_instance_replication_state(self) -> InstanceStatus:
         """Gets the instance replication state."""
         query = (
