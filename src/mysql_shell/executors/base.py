@@ -10,11 +10,15 @@ from ..models import ConnectionDetails
 class BaseExecutor(ABC):
     """Base class for all MySQL Shell executors."""
 
+    def __init__(self, conn_details: ConnectionDetails, shell_path: str):
+        """Initialize the executor."""
+        self._conn_details = conn_details
+        self._shell_path = shell_path
+
     @property
-    @abstractmethod
     def connection_details(self) -> ConnectionDetails:
         """Return the connection details."""
-        raise NotImplementedError()
+        return self._conn_details
 
     @abstractmethod
     def check_connection(self) -> None:
