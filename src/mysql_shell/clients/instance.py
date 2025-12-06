@@ -246,13 +246,16 @@ class MySQLInstanceClient:
 
     def get_instance_variable(self, scope: VariableScope, name: str) -> Any:
         """Gets an instance variable by scope and name."""
-        escaped_name = self._quoter.escape(name)
+        if scope in (VariableScope.PERSIST, VariableScope.PERSIST_ONLY):
+            raise ValueError("Invalid scope")
+
+        quoted_name = self._quoter.quote_identifier(name)
 
         query = "SELECT @@{scope}.{name} AS {alias}"
         query = query.format(
             scope=scope.value,
-            name=escaped_name,
-            alias=escaped_name,
+            name=quoted_name,
+            alias=quoted_name,
         )
 
         try:
@@ -265,17 +268,14 @@ class MySQLInstanceClient:
 
     def set_instance_variable(self, scope: VariableScope, name: str, value: Any) -> None:
         """Sets an instance variable by scope and name."""
-        escaped_name = self._quoter.escape(name)
-        escaped_value = self._quoter.escape(value)
-
-        if escaped_value != value:
-            raise ValueError(f"Invalid value for instance variable {scope}.{name}")
+        quoted_name = self._quoter.quote_identifier(name)
+        quoted_value = self._quoter.quote_value(value) if isinstance(value, str) else value
 
         query = "SET @@{scope}.{name} = {value}"
         query = query.format(
             scope=scope.value,
-            name=escaped_name,
-            value=escaped_value,
+            name=quoted_name,
+            value=quoted_value,
         )
 
         try:

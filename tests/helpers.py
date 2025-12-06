@@ -45,7 +45,7 @@ def temp_process(query: str):
 
 
 @contextmanager
-def temp_variable(scope: VariableScope, name: str, value: Any) -> Generator:
+def temp_variable(scope: VariableScope, name: str, new_value: Any) -> Generator:
     """Context manager to run a piece of code with a variable changed."""
     executor = build_local_executor(
         username=os.environ.get("MYSQL_USERNAME"),
@@ -56,12 +56,14 @@ def temp_variable(scope: VariableScope, name: str, value: Any) -> Generator:
     get_query = "SELECT @@{scope}.{name} AS {name}"
     get_query = get_query.format(scope=scope.value, name=name)
 
-    prev_value = executor.execute_sql(get_query)[0][name]
+    old_value = executor.execute_sql(get_query)[0][name]
+    old_value = f"'{old_value}'" if isinstance(old_value, str) else old_value
+    new_value = f"'{new_value}'" if isinstance(new_value, str) else new_value
 
     try:
-        set_query_new = set_query.format(scope=scope.value, name=name, value=value)
+        set_query_new = set_query.format(scope=scope.value, name=name, value=new_value)
         executor.execute_sql(set_query_new)
         yield
     finally:
-        set_query_old = set_query.format(scope=scope.value, name=name, value=prev_value)
+        set_query_old = set_query.format(scope=scope.value, name=name, value=old_value)
         executor.execute_sql(set_query_old)
