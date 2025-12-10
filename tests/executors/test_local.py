@@ -38,11 +38,7 @@ class TestLocalExecutor:
         try:
             executor.check_connection()
         except ExecutionError as e:
-            assert (
-                str(e)
-                .removeprefix("MySQL Shell failed: ")
-                .startswith("MySQL Error 1045 (28000): Access denied for user")
-            )
+            assert str(e).startswith("MySQL Error 1045 (28000): Access denied for user")
 
     def test_execute_py(self, executor: LocalExecutor):
         """Test the execution of Python scripts."""
@@ -63,7 +59,17 @@ class TestLocalExecutor:
         try:
             executor.execute_py("syntax")
         except ExecutionError as e:
-            assert str(e).removeprefix("MySQL Shell failed: ") == ""
+            assert str(e) == ""
+
+        executor = build_local_executor(
+            username="wrong_username",
+            password="wrong_password",
+        )
+
+        try:
+            executor.check_connection()
+        except ExecutionError as e:
+            assert str(e).startswith("MySQL Error 1045 (28000): Access denied for user")
 
     def test_execute_sql(self, executor: LocalExecutor):
         """Test the execution of SQL scripts."""
@@ -80,8 +86,14 @@ class TestLocalExecutor:
         try:
             executor.execute_sql("SELECT")
         except ExecutionError as e:
-            assert (
-                str(e)
-                .removeprefix("MySQL Shell failed: ")
-                .startswith("You have an error in your SQL syntax")
-            )
+            assert str(e).startswith("You have an error in your SQL syntax")
+
+        executor = build_local_executor(
+            username="wrong_username",
+            password="wrong_password",
+        )
+
+        try:
+            executor.check_connection()
+        except ExecutionError as e:
+            assert str(e).startswith("MySQL Error 1045 (28000): Access denied for user")

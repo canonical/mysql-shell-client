@@ -16,7 +16,6 @@ from mysql_shell.models.status import InstanceStatus
 from ..helpers import (
     build_local_executor,
     temp_process,
-    temp_variable,
 )
 
 
@@ -230,8 +229,14 @@ class TestInstanceClient:
         var_name = "max_connections"
         var_value = 100
 
-        with temp_variable(VariableScope.GLOBAL, var_name, var_value):
-            assert client.get_instance_variable(VariableScope.GLOBAL, var_name) == var_value
+        client.set_instance_variable(VariableScope.GLOBAL, var_name, var_value)
+        assert client.get_instance_variable(VariableScope.GLOBAL, var_name) == var_value
+
+        var_name = "ssl_ca"
+        var_value = "ca.pem"
+
+        client.set_instance_variable(VariableScope.GLOBAL, var_name, var_value)
+        assert client.get_instance_variable(VariableScope.GLOBAL, var_name) == var_value
 
     def test_install_plugin(self, client: MySQLInstanceClient):
         """Test the installation of an instance plugin."""
