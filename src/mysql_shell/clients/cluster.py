@@ -3,13 +3,14 @@
 
 import json
 import logging
+from typing import Mapping
 
 from ..executors import BaseExecutor
 from ..executors.errors import ExecutionError
 
 logger = logging.getLogger()
 
-Options = dict[str, str] | None
+_Options = Mapping[str, str] | None
 
 
 class MySQLClusterClient:
@@ -19,7 +20,7 @@ class MySQLClusterClient:
         """Initialize the class."""
         self._executor = executor
 
-    def create_cluster(self, cluster_name: str, options: Options = None) -> None:
+    def create_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Creates an InnoDB cluster."""
         command = f"dba.create_cluster('{cluster_name}', {options})"
 
@@ -30,7 +31,7 @@ class MySQLClusterClient:
             logger.error(f"Failed to create cluster {cluster_name}")
             raise
 
-    def destroy_cluster(self, cluster_name: str, options: Options = None) -> None:
+    def destroy_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Destroys an InnoDB cluster."""
         command = "\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
@@ -76,7 +77,7 @@ class MySQLClusterClient:
         else:
             return json.loads(result)
 
-    def rescan_cluster(self, cluster_name: str, options: Options = None) -> None:
+    def rescan_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Rescans an InnoDB cluster."""
         command = "\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
@@ -90,7 +91,7 @@ class MySQLClusterClient:
             logger.error(f"Failed to re-scan cluster {cluster_name}")
             raise
 
-    def reboot_cluster(self, cluster_name: str, options: Options = None) -> None:
+    def reboot_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Reboots an InnoDB cluster."""
         command = f"dba.reboot_cluster_from_complete_outage('{cluster_name}', {options})"
 
@@ -155,7 +156,7 @@ class MySQLClusterClient:
         cluster_name: str,
         source_host: str,
         source_port: str,
-        options: Options = None,
+        options: _Options = None,
     ) -> None:
         """Creates an InnoDB replica cluster into the cluster set."""
         address = f"{source_host}:{source_port}"
@@ -193,7 +194,7 @@ class MySQLClusterClient:
             logger.error(f"Failed to make cluster {cluster_name} the primary")
             raise
 
-    def remove_cluster_set_replica(self, cluster_name: str, options: Options = None) -> None:
+    def remove_cluster_set_replica(self, cluster_name: str, options: _Options = None) -> None:
         """Removes an InnoDB replica cluster from the cluster set."""
         command = "\n".join((
             f"shell.connect_to_primary()",
@@ -228,7 +229,7 @@ class MySQLClusterClient:
         cluster_name: str,
         instance_host: str,
         instance_port: str,
-        options: Options = None,
+        options: _Options = None,
     ) -> None:
         """Attached an instance into an InnoDB cluster."""
         address = f"{instance_host}:{instance_port}"
@@ -249,7 +250,7 @@ class MySQLClusterClient:
         cluster_name: str,
         instance_host: str,
         instance_port: str,
-        options: Options = None,
+        options: _Options = None,
     ) -> None:
         """Detaches an instance from an InnoDB cluster."""
         address = f"{instance_host}:{instance_port}"
@@ -290,7 +291,7 @@ class MySQLClusterClient:
         cluster_name: str,
         instance_host: str,
         instance_port: str,
-        options: Options = None,
+        options: _Options = None,
     ) -> None:
         """Rejoins an instance back into its InnoDB cluster."""
         address = f"{instance_host}:{instance_port}"
@@ -310,7 +311,7 @@ class MySQLClusterClient:
         self,
         instance_host: str,
         instance_port: str,
-        options: Options = None,
+        options: _Options = None,
     ) -> dict:
         """Checks for an instance configuration before joining an InnoDB cluster."""
         address = f"{instance_host}:{instance_port}"
@@ -332,7 +333,7 @@ class MySQLClusterClient:
         self,
         instance_host: str,
         instance_port: str,
-        options: Options = None,
+        options: _Options = None,
     ) -> None:
         """Sets up an instance configuration before joining an InnoDB cluster."""
         if not options:
@@ -385,7 +386,7 @@ class MySQLClusterClient:
         cluster_name: str,
         instance_host: str,
         instance_port: str,
-        options: Options = None,
+        options: _Options = None,
     ) -> None:
         """Updates an instance within an InnoDB cluster."""
         address = f"{instance_host}:{instance_port}"

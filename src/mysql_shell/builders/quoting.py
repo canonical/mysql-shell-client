@@ -37,7 +37,7 @@ class StringQueryQuoter:
 
         return value
 
-    def quote_value(self, value: str) -> str:
+    def quote_value(self, value: Any) -> str:
         """Quotes the provided value."""
         return f"'{self.escape(value)}'"
 
