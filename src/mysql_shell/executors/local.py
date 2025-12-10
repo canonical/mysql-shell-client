@@ -2,6 +2,7 @@
 # See LICENSE file for licensing details.
 
 import json
+import re
 import subprocess
 
 from ..models import ConnectionDetails
@@ -39,17 +40,33 @@ class LocalExecutor(BaseExecutor):
             ]
 
     @staticmethod
-    def _parse_output(output: str) -> str | dict:
+    def _parse_error(output: str) -> str:
+        """Parse the error message."""
+        # MySQL Shell always prompts for the user password
+        return output.split("\n")[1]
+
+    @staticmethod
+    def _parse_output(output: str) -> dict:
         """Parse the error message."""
         # MySQL Shell always prompts for the user password
         output = output.split("\n")[1]
+        output = json.loads(output)
+        return output
 
-        try:
-            message = json.loads(output)
-        except json.JSONDecodeError:
-            return output
-        else:
-            return message
+    @staticmethod
+    def _strip_password(error: subprocess.SubprocessError):
+        """Strip passwords from SQL scripts."""
+        if not hasattr(error, "cmd"):
+            return error
+
+        password_pattern = re.compile("(?<=IDENTIFIED BY ')[^']+(?=')")
+        password_replace = "*****"
+
+        for index, value in enumerate(error.cmd):
+            if "IDENTIFIED" in value:
+                error.cmd[index] = re.sub(password_pattern, password_replace, value)
+
+        return error
 
     def check_connection(self) -> None:
         """Check the connection."""
@@ -66,9 +83,10 @@ class LocalExecutor(BaseExecutor):
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            raise ExecutionError(f"MySQL Shell failed: {self._parse_output(exc.output)}")
+            err = self._parse_error(exc.output)
+            raise ExecutionError(err)
         except subprocess.TimeoutExpired:
-            raise ExecutionError(f"MySQL Shell timed out")
+            raise ExecutionError()
 
     def execute_py(self, script: str, *, timeout: int = 10) -> str:
         """Execute a Python script.
@@ -98,11 +116,10 @@ class LocalExecutor(BaseExecutor):
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            error = self._parse_output(exc.output)
-            error = error.get("error")
-            raise ExecutionError(f"MySQL Shell failed: {error}")
+            err = self._parse_error(exc.output)
+            raise ExecutionError(err)
         except subprocess.TimeoutExpired:
-            raise ExecutionError(f"MySQL Shell timed out")
+            raise ExecutionError()
         else:
             result = self._parse_output(output)
             result = result.get("info", "")
@@ -135,12 +152,12 @@ class LocalExecutor(BaseExecutor):
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            error = self._parse_output(exc.output)
-            error = error.get("error")
-            error = error.get("message")
-            raise ExecutionError(f"MySQL Shell failed: {error}")
-        except subprocess.TimeoutExpired:
-            raise ExecutionError(f"MySQL Shell timed out")
+            err = self._parse_error(exc.output)
+            exc = self._strip_password(exc)
+            raise ExecutionError(err) from exc
+        except subprocess.TimeoutExpired as exc:
+            exc = self._strip_password(exc)
+            raise ExecutionError() from exc
         else:
             result = self._parse_output(output)
             result = result.get("rows", [])
