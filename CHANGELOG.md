@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Added
+- Get cluster labels method to InstanceClient class.
 
 ## [0.3.0][changes-0.3.0] - 2025-12-05
 ### Added

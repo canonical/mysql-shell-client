@@ -67,13 +67,14 @@ class TestInstanceClient:
             "FROM mysql.role_edges "
             "WHERE to_user='{username}' AND to_host='{hostname}'"
         )
-
         query = query.format(
             username=entity.username if isinstance(entity, User) else entity.rolename,
             hostname=entity.hostname,
         )
 
-        return [row["from_user"] for row in client._executor.execute_sql(query)]
+        rows = client._executor.execute_sql(query)
+        users = [row["from_user"] for row in rows]
+        return users
 
     @staticmethod
     def _get_processes(client: MySQLInstanceClient, info: str):
@@ -85,7 +86,9 @@ class TestInstanceClient:
         )
         query = query.format(info=info)
 
-        return [row["processlist_id"] for row in client._executor.execute_sql(query)]
+        rows = client._executor.execute_sql(query)
+        procs = [row["processlist_id"] for row in rows]
+        return procs
 
     def test_check_work_ongoing(self, client: MySQLInstanceClient):
         """Test the checking of instance work."""
@@ -203,6 +206,12 @@ class TestInstanceClient:
     def test_get_cluster_instance_labels(self, client: MySQLInstanceClient):
         """Test the fetching of all the cluster instance labels."""
         pass
+
+    def test_get_cluster_labels(self, client: MySQLInstanceClient):
+        """Test the fetching of all the cluster labels."""
+        clusters = client.get_cluster_labels()
+        assert "default" not in clusters
+        assert "my-cluster" in clusters
 
     def test_get_instance_replication_state(self, client: MySQLInstanceClient):
         """Test the fetching of the instance replication state."""
