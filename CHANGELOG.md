@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+
+## [0.4.1][changes-0.4.1] - 2025-12-12
 ### Fixed
 - Crash when querying instance version.
 - Crash when querying instance label.
@@ -52,5 +54,6 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 [changes-0.2.0]: https://github.com/canonical/mysql-shell-client/compare/0.1.0...0.2.0
 [changes-0.3.0]: https://github.com/canonical/mysql-shell-client/compare/0.2.0...0.3.0
 [changes-0.4.0]: https://github.com/canonical/mysql-shell-client/compare/0.3.0...0.4.0
+[changes-0.4.1]: https://github.com/canonical/mysql-shell-client/compare/0.4.0...0.4.1
 [docs-changelog]: https://keepachangelog.com/en/1.0.0/
 [docs-semver]: https://semver.org/spec/v2.0.0.html
