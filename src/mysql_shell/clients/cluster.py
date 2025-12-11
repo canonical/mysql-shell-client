@@ -64,8 +64,8 @@ class MySQLClusterClient:
     def list_cluster_routers(self, cluster_name: str) -> dict:
         """Lists an InnoDB cluster connected MySQL Routers."""
         command = "\n".join((
-            f"cluster = dba.get_cluster('{cluster_name}')"
-            f"routers = cluster.list_routers()"
+            f"cluster = dba.get_cluster('{cluster_name}')",
+            f"routers = cluster.list_routers()",
             f"print(routers)",
         ))
 
@@ -138,8 +138,8 @@ class MySQLClusterClient:
         """Lists an InnoDB cluster set connected MySQL Routers."""
         command = "\n".join((
             f"shell.connect_to_primary()",
-            f"cluster_set = dba.get_cluster_set()"
-            f"routers = cluster_set.list_routers()"
+            f"cluster_set = dba.get_cluster_set()",
+            f"routers = cluster_set.list_routers()",
             f"print(routers)",
         ))
 
@@ -307,50 +307,32 @@ class MySQLClusterClient:
             logger.error(f"Failed to rejoin instance {address} into cluster {cluster_name}")
             raise
 
-    def check_instance_before_cluster(
-        self,
-        instance_host: str,
-        instance_port: str,
-        options: _Options = None,
-    ) -> dict:
+    def check_instance_before_cluster(self, options: _Options = None) -> bool:
         """Checks for an instance configuration before joining an InnoDB cluster."""
-        address = f"{instance_host}:{instance_port}"
-        command = f"\n".join((
-            f"result = dba.check_instance_configuration('{address}', {options})",
-            f"print(result)",
-        ))
+        command = f"assert dba.check_instance_configuration(options={options})['status'] == 'ok'"
+        host = self._executor.connection_details.host
+        port = self._executor.connection_details.port
 
         try:
-            logger.debug(f"Checking for instance {address} config")
-            result = self._executor.execute_py(command)
-        except ExecutionError:
-            logger.error(f"Failed to check for instance {address} config")
-            raise
-        else:
-            return json.loads(result)
-
-    def setup_instance_before_cluster(
-        self,
-        instance_host: str,
-        instance_port: str,
-        options: _Options = None,
-    ) -> None:
-        """Sets up an instance configuration before joining an InnoDB cluster."""
-        if not options:
-            options = {
-                "clusterAdmin": self._executor.connection_details.username,
-                "clusterAdminPassword": self._executor.connection_details.password,
-                "restart": True,
-            }
-
-        address = f"{instance_host}:{instance_port}"
-        command = f"dba.configure_instance('{address}', {options})"
-
-        try:
-            logger.debug(f"Setting up instance {address} config")
+            logger.debug(f"Checking for instance {host}:{port} config")
             self._executor.execute_py(command)
         except ExecutionError:
-            logger.error(f"Failed to setup instance {address} config")
+            logger.error(f"Failed to check for instance {host}:{port} config")
+            return False
+        else:
+            return True
+
+    def setup_instance_before_cluster(self, options: _Options = None) -> None:
+        """Sets up an instance configuration before joining an InnoDB cluster."""
+        command = f"dba.configure_instance(options={options})"
+        host = self._executor.connection_details.host
+        port = self._executor.connection_details.port
+
+        try:
+            logger.debug(f"Setting up instance {host}:{port} config")
+            self._executor.execute_py(command)
+        except ExecutionError:
+            logger.error(f"Failed to setup instance {host}:{port} config")
             raise
 
     def promote_instance_within_cluster(

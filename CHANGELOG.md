@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Fixed
+- Instance-config check method of ClusterClient class.
+- Instance-config setup method of ClusterClient class.
 
 ## [0.4.0][changes-0.4.0] - 2025-12-10
 ### Added

@@ -99,6 +99,10 @@ class LocalExecutor(BaseExecutor):
             String with the output of the MySQL Shell command.
             The output cannot be parsed to JSON, as the output depends on the script
         """
+        # Prepend every Python command with useWizards=False, to disable interactive mode.
+        # Cannot be set on command line as it conflicts with --passwords-from-stdin.
+        script = "shell.options.set('useWizards', False)\n" + script
+
         command = [
             *self._common_args(),
             *self._connection_args(),
