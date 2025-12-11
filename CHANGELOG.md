@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Fixed
+- Crash when parsing errors in the LocalExecutor class.
 - Instance-config check method of ClusterClient class.
 - Instance-config setup method of ClusterClient class.
 
