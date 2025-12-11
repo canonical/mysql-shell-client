@@ -88,7 +88,7 @@ class LocalExecutor(BaseExecutor):
         except subprocess.TimeoutExpired:
             raise ExecutionError()
 
-    def execute_py(self, script: str, *, timeout: int = 10) -> str:
+    def execute_py(self, script: str, *, timeout: int | None = None) -> str:
         """Execute a Python script.
 
         Arguments:
@@ -99,6 +99,10 @@ class LocalExecutor(BaseExecutor):
             String with the output of the MySQL Shell command.
             The output cannot be parsed to JSON, as the output depends on the script
         """
+        # Prepend every Python command with useWizards=False, to disable interactive mode.
+        # Cannot be set on command line as it conflicts with --passwords-from-stdin.
+        script = "shell.options.set('useWizards', False)\n" + script
+
         command = [
             *self._common_args(),
             *self._connection_args(),
@@ -125,7 +129,7 @@ class LocalExecutor(BaseExecutor):
             result = result.get("info", "")
             return result.strip()
 
-    def execute_sql(self, script: str, *, timeout: int = 10) -> list[dict]:
+    def execute_sql(self, script: str, *, timeout: int | None = None) -> list[dict]:
         """Execute a SQL script.
 
         Arguments:

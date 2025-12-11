@@ -14,7 +14,7 @@ class ExecutionError(RuntimeError):
 
         if not message.startswith("MySQL Error"):
             message = json.loads(message)
-            message = message["error"] if message else message
-            message = message["message"] if message else message
+            message = message.get("error") if message else message
+            message = message.get("message") if message else message
 
         super().__init__(message)

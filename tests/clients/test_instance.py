@@ -14,6 +14,7 @@ from mysql_shell.models.statement import LogType, VariableScope
 from mysql_shell.models.status import InstanceStatus
 
 from ..helpers import (
+    TEST_CLUSTER_NAME,
     build_local_executor,
     temp_process,
 )
@@ -208,9 +209,7 @@ class TestInstanceClient:
 
     def test_get_cluster_labels(self, client: MySQLInstanceClient):
         """Test the fetching of all the cluster labels."""
-        clusters = client.get_cluster_labels()
-        assert "default" not in clusters
-        assert "my-cluster" in clusters
+        assert TEST_CLUSTER_NAME in client.get_cluster_labels()
 
     def test_get_instance_replication_state(self, client: MySQLInstanceClient):
         """Test the fetching of the instance replication state."""

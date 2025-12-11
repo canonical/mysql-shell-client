@@ -6,7 +6,10 @@ from contextlib import suppress
 
 import pytest
 
-from ..helpers import build_local_executor
+from ..helpers import (
+    TEST_CLUSTER_NAME,
+    build_local_executor,
+)
 
 _GTID_MODES_ORDERED = (
     "OFF",
@@ -39,4 +42,4 @@ def initialize_cluster():
         executor.execute_sql(f"SET @@GLOBAL.gtid_mode = '{mode}'")
 
     with suppress(Exception):
-        executor.execute_py("dba.create_cluster('my-cluster')")
+        executor.execute_py(f"dba.create_cluster('{TEST_CLUSTER_NAME}')")

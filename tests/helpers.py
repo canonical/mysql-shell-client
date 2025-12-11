@@ -10,6 +10,8 @@ from typing import Any, Generator
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models import ConnectionDetails, VariableScope
 
+TEST_CLUSTER_NAME = "test-cluster"
+
 
 def build_local_executor(username: str, password: str, host: str = "0.0.0.0", port: str = "3306"):
     """Build a local executor for testing."""
