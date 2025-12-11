@@ -88,7 +88,7 @@ class LocalExecutor(BaseExecutor):
         except subprocess.TimeoutExpired:
             raise ExecutionError()
 
-    def execute_py(self, script: str, *, timeout: int = 10) -> str:
+    def execute_py(self, script: str, *, timeout: int | None = None) -> str:
         """Execute a Python script.
 
         Arguments:
@@ -125,7 +125,7 @@ class LocalExecutor(BaseExecutor):
             result = result.get("info", "")
             return result.strip()
 
-    def execute_sql(self, script: str, *, timeout: int = 10) -> list[dict]:
+    def execute_sql(self, script: str, *, timeout: int | None = None) -> list[dict]:
         """Execute a SQL script.
 
         Arguments:

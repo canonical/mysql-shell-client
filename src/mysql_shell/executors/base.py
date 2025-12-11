@@ -26,11 +26,11 @@ class BaseExecutor(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def execute_py(self, script: str, *, timeout: int = 10) -> str:
+    def execute_py(self, script: str, *, timeout: int | None = None) -> str:
         """Execute a Python script."""
         raise NotImplementedError()
 
     @abstractmethod
-    def execute_sql(self, script: str, *, timeout: int = 10) -> Sequence[dict]:
+    def execute_sql(self, script: str, *, timeout: int | None = None) -> Sequence[dict]:
         """Execute a SQL script."""
         raise NotImplementedError()
