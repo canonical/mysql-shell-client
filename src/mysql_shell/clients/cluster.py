@@ -309,7 +309,11 @@ class MySQLClusterClient:
 
     def check_instance_before_cluster(self, options: _Options = None) -> bool:
         """Checks for an instance configuration before joining an InnoDB cluster."""
-        command = f"assert dba.check_instance_configuration(options={options})['status'] == 'ok'"
+        command = "\n".join((
+            f"result = dba.check_instance_configuration(options={options})",
+            f"assert result['status'] == 'ok'",
+        ))
+
         host = self._executor.connection_details.host
         port = self._executor.connection_details.port
 
@@ -372,10 +376,16 @@ class MySQLClusterClient:
     ) -> None:
         """Updates an instance within an InnoDB cluster."""
         address = f"{instance_host}:{instance_port}"
-        command = f"\n".join((
-            *[f"cluster = dba.get_cluster('{cluster_name}')"],
-            *[f"cluster.set_instance_option('{address}', '{k}', {v})" for k, v in options.items()],
-        ))
+        command = [
+            f"cluster = dba.get_cluster('{cluster_name}')",
+        ]
+
+        for key, val in options.items():
+            val = f"'{val}'" if isinstance(val, str) else val
+            cmd = f"cluster.set_instance_option('{address}', '{key}', {val})"
+            command.append(cmd)
+
+        command = "\n".join(command)
 
         try:
             logger.debug(f"Updating instance {address} within cluster {cluster_name}")

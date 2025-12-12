@@ -69,12 +69,12 @@ class TestClusterClient:
                 cluster_name=TEST_CLUSTER_NAME,
                 instance_host="0.0.0.0",
                 instance_port="3306",
-                options={"label": "'mysql-0'"},
+                options={"label": "mysql-0"},
             )
         finally:
             client.update_instance_within_cluster(
                 cluster_name=TEST_CLUSTER_NAME,
                 instance_host="0.0.0.0",
                 instance_port="3306",
-                options={"label": f"'{address}'"},
+                options={"label": f"{address}"},
             )
