@@ -265,7 +265,7 @@ class MySQLInstanceClient:
 
         return InstanceRole(rows[0]["member_role"])
 
-    def get_instance_variable(self, scope: VariableScope, name: str) -> Any:
+    def get_instance_variable(self, scope: VariableScope, name: str) -> Any | None:
         """Gets an instance variable by scope and name."""
         if scope in (VariableScope.PERSIST, VariableScope.PERSIST_ONLY):
             raise ValueError("Invalid scope")
@@ -284,8 +284,11 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error(f"Failed to get instance variable {scope}.{name}")
             raise
-        else:
-            return rows[0][name]
+
+        if not rows:
+            return None
+
+        return rows[0][name]
 
     def set_instance_variable(self, scope: VariableScope, name: str, value: Any) -> None:
         """Sets an instance variable by scope and name."""
@@ -305,13 +308,13 @@ class MySQLInstanceClient:
             logger.error(f"Failed to set instance variable {scope}.{name}")
             raise
 
-    def get_instance_version(self) -> str:
+    def get_instance_version(self) -> str | None:
         """Gets the instance version value."""
-        return self.get_instance_variable(VariableScope.GLOBAL, "version").split("-")[0]
+        version = self.get_instance_variable(VariableScope.GLOBAL, "version")
+        if not version:
+            return None
 
-    def get_instance_read_only(self) -> bool:
-        """Gets the instance read-only value."""
-        return self.get_instance_variable(VariableScope.GLOBAL, "super_read_only") == 1
+        return version.split("-")[0]
 
     def install_instance_plugin(self, name: str, path: str) -> None:
         """Installs an instance plugin by name and path."""
