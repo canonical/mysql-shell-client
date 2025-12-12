@@ -177,7 +177,7 @@ class MySQLInstanceClient:
         finally:
             self.set_instance_variable(VariableScope.SESSION, "sql_log_bin", bin_logging)
 
-    def get_cluster_instance_label(self) -> str:
+    def get_cluster_instance_label(self) -> str | None:
         """Gets the instance label within the cluster."""
         query = (
             "SELECT instance_name "
@@ -190,8 +190,11 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error("Failed to get cluster instance label")
             raise
-        else:
-            return rows[0]["instance_name"]
+
+        if not rows:
+            return None
+
+        return rows[0]["instance_name"]
 
     def get_cluster_instance_labels(self, cluster_name: str) -> list[str]:
         """Gets the instance labels within the cluster."""

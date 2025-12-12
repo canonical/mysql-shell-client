@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Fixed
+- Crash when querying instance label.
 - Crash when querying instance role and instance status.
 - Crash when parsing errors in the LocalExecutor class.
 - Instance-config check method of ClusterClient class.
