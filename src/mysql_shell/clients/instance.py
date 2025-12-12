@@ -2,7 +2,7 @@
 # See LICENSE file for licensing details.
 
 import logging
-from typing import Any, Collection, Mapping
+from typing import Any, Mapping
 
 from ..builders import StringQueryQuoter
 from ..executors import BaseExecutor
@@ -15,8 +15,6 @@ from ..models.status import InstanceStatus
 logger = logging.getLogger()
 
 _Attributes = Mapping[str, str] | None
-_OptionalRoles = Collection[InstanceRole] | None
-_OptionalStates = Collection[InstanceStatus] | None
 
 
 class MySQLInstanceClient:
@@ -226,7 +224,7 @@ class MySQLInstanceClient:
         else:
             return [row["cluster_name"] for row in rows]
 
-    def get_instance_replication_state(self) -> InstanceStatus:
+    def get_instance_replication_state(self) -> InstanceStatus | None:
         """Gets the instance replication state."""
         query = (
             "SELECT member_state "
@@ -239,10 +237,13 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error("Failed to get instance replication state")
             raise
-        else:
-            return InstanceStatus(rows[0]["member_state"])
 
-    def get_instance_replication_role(self) -> InstanceRole:
+        if not rows:
+            return None
+
+        return InstanceStatus(rows[0]["member_state"])
+
+    def get_instance_replication_role(self) -> InstanceRole | None:
         """Gets the instance replication role."""
         query = (
             "SELECT member_role "
@@ -255,8 +256,11 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error("Failed to get instance replication role")
             raise
-        else:
-            return InstanceRole(rows[0]["member_role"])
+
+        if not rows:
+            return None
+
+        return InstanceRole(rows[0]["member_role"])
 
     def get_instance_variable(self, scope: VariableScope, name: str) -> Any:
         """Gets an instance variable by scope and name."""
