@@ -22,6 +22,7 @@ class LocalExecutor(BaseExecutor):
         return [
             self._shell_path,
             "--json=raw",
+            "--save-passwords=never",
             "--passwords-from-stdin",
         ]
 
