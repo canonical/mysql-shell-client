@@ -2,7 +2,7 @@
 # See LICENSE file for licensing details.
 
 import logging
-from typing import Any, Collection, Mapping
+from typing import Any, Mapping
 
 from ..builders import StringQueryQuoter
 from ..executors import BaseExecutor
@@ -15,8 +15,6 @@ from ..models.status import InstanceStatus
 logger = logging.getLogger()
 
 _Attributes = Mapping[str, str] | None
-_OptionalRoles = Collection[InstanceRole] | None
-_OptionalStates = Collection[InstanceStatus] | None
 
 
 class MySQLInstanceClient:
@@ -179,7 +177,7 @@ class MySQLInstanceClient:
         finally:
             self.set_instance_variable(VariableScope.SESSION, "sql_log_bin", bin_logging)
 
-    def get_cluster_instance_label(self) -> str:
+    def get_cluster_instance_label(self) -> str | None:
         """Gets the instance label within the cluster."""
         query = (
             "SELECT instance_name "
@@ -192,8 +190,11 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error("Failed to get cluster instance label")
             raise
-        else:
-            return rows[0]["instance_name"]
+
+        if not rows:
+            return None
+
+        return rows[0]["instance_name"]
 
     def get_cluster_instance_labels(self, cluster_name: str) -> list[str]:
         """Gets the instance labels within the cluster."""
@@ -226,7 +227,7 @@ class MySQLInstanceClient:
         else:
             return [row["cluster_name"] for row in rows]
 
-    def get_instance_replication_state(self) -> InstanceStatus:
+    def get_instance_replication_state(self) -> InstanceStatus | None:
         """Gets the instance replication state."""
         query = (
             "SELECT member_state "
@@ -239,10 +240,13 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error("Failed to get instance replication state")
             raise
-        else:
-            return InstanceStatus(rows[0]["member_state"])
 
-    def get_instance_replication_role(self) -> InstanceRole:
+        if not rows:
+            return None
+
+        return InstanceStatus(rows[0]["member_state"])
+
+    def get_instance_replication_role(self) -> InstanceRole | None:
         """Gets the instance replication role."""
         query = (
             "SELECT member_role "
@@ -255,10 +259,13 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error("Failed to get instance replication role")
             raise
-        else:
-            return InstanceRole(rows[0]["member_role"])
 
-    def get_instance_variable(self, scope: VariableScope, name: str) -> Any:
+        if not rows:
+            return None
+
+        return InstanceRole(rows[0]["member_role"])
+
+    def get_instance_variable(self, scope: VariableScope, name: str) -> Any | None:
         """Gets an instance variable by scope and name."""
         if scope in (VariableScope.PERSIST, VariableScope.PERSIST_ONLY):
             raise ValueError("Invalid scope")
@@ -277,8 +284,11 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error(f"Failed to get instance variable {scope}.{name}")
             raise
-        else:
-            return rows[0][name]
+
+        if not rows:
+            return None
+
+        return rows[0][name]
 
     def set_instance_variable(self, scope: VariableScope, name: str, value: Any) -> None:
         """Sets an instance variable by scope and name."""
@@ -298,13 +308,13 @@ class MySQLInstanceClient:
             logger.error(f"Failed to set instance variable {scope}.{name}")
             raise
 
-    def get_instance_version(self) -> str:
+    def get_instance_version(self) -> str | None:
         """Gets the instance version value."""
-        return self.get_instance_variable(VariableScope.GLOBAL, "version").split("-")[0]
+        version = self.get_instance_variable(VariableScope.GLOBAL, "version")
+        if not version:
+            return None
 
-    def get_instance_read_only(self) -> bool:
-        """Gets the instance read-only value."""
-        return self.get_instance_variable(VariableScope.GLOBAL, "super_read_only") == 1
+        return version.split("-")[0]
 
     def install_instance_plugin(self, name: str, path: str) -> None:
         """Installs an instance plugin by name and path."""
