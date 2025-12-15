@@ -4,6 +4,7 @@
 import json
 import re
 import subprocess
+from typing import Any, Generator
 
 from ..models import ConnectionDetails
 from .base import BaseExecutor
@@ -40,19 +41,38 @@ class LocalExecutor(BaseExecutor):
                 f"--user={self._conn_details.username}",
             ]
 
-    @staticmethod
-    def _parse_error(output: str) -> str:
+    def _parse_error(self, output: str, key: str) -> Any:
         """Parse the error message."""
-        # MySQL Shell always prompts for the user password
-        return output.split("\n")[1]
+        for log in self._iter_output(output):
+            if log.startswith("MySQL Error"):
+                return log
+
+            log = json.loads(log)
+            msg = log.get(key)
+            if not isinstance(msg, str) or msg.strip():
+                return msg
+
+        return ""
+
+    def _parse_output(self, output: str, key: str) -> Any:
+        """Parse the error message."""
+        for log in self._iter_output(output):
+            log = json.loads(log)
+            msg = log.get(key)
+            if not isinstance(msg, str) or msg.strip():
+                return msg
+
+        return {}
 
     @staticmethod
-    def _parse_output(output: str) -> dict:
-        """Parse the error message."""
-        # MySQL Shell always prompts for the user password
-        output = output.split("\n")[1]
-        output = json.loads(output)
-        return output
+    def _iter_output(output: str) -> Generator:
+        """Iterates over the log lines in reversed order."""
+        logs = output.split("\n")
+
+        # MySQL Shell always prints prompts and warnings first
+        for log in reversed(logs):
+            if log:
+                yield log
 
     @staticmethod
     def _strip_password(error: subprocess.SubprocessError):
@@ -64,7 +84,7 @@ class LocalExecutor(BaseExecutor):
         password_replace = "*****"
 
         for index, value in enumerate(error.cmd):
-            if "IDENTIFIED" in value:
+            if "IDENTIFIED BY" in value:
                 error.cmd[index] = re.sub(password_pattern, password_replace, value)
 
         return error
@@ -84,12 +104,12 @@ class LocalExecutor(BaseExecutor):
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output)
+            err = self._parse_error(exc.output, "error")
             raise ExecutionError(err)
         except subprocess.TimeoutExpired:
             raise ExecutionError()
 
-    def execute_py(self, script: str, *, timeout: int | None = None) -> str:
+    def execute_py(self, script: str, *, timeout: int | None = None) -> Any:
         """Execute a Python script.
 
         Arguments:
@@ -121,14 +141,12 @@ class LocalExecutor(BaseExecutor):
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output)
+            err = self._parse_error(exc.output, "error")
             raise ExecutionError(err)
         except subprocess.TimeoutExpired:
             raise ExecutionError()
         else:
-            result = self._parse_output(output)
-            result = result.get("info", "")
-            return result.strip()
+            return self._parse_output(output, "info")
 
     def execute_sql(self, script: str, *, timeout: int | None = None) -> list[dict]:
         """Execute a SQL script.
@@ -157,13 +175,11 @@ class LocalExecutor(BaseExecutor):
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output)
+            err = self._parse_error(exc.output, "error")
             exc = self._strip_password(exc)
             raise ExecutionError(err) from exc
         except subprocess.TimeoutExpired as exc:
             exc = self._strip_password(exc)
             raise ExecutionError() from exc
         else:
-            result = self._parse_output(output)
-            result = result.get("rows", [])
-            return result
+            return self._parse_output(output, "rows")
