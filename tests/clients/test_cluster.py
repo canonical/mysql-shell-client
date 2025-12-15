@@ -58,7 +58,8 @@ class TestClusterClient:
 
     def test_check_instance_before_cluster(self, client: MySQLClusterClient):
         """Test the checking of an instance config before joining a cluster."""
-        assert client.check_instance_before_cluster()
+        result = client.check_instance_before_cluster()
+        assert result["status"] == "ok"
 
     def test_update_instance_within_cluster(self, client: MySQLClusterClient):
         """Test the updating an instance config within a cluster."""

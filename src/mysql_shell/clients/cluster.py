@@ -307,11 +307,11 @@ class MySQLClusterClient:
             logger.error(f"Failed to rejoin instance {address} into cluster {cluster_name}")
             raise
 
-    def check_instance_before_cluster(self, options: _Options = None) -> bool:
+    def check_instance_before_cluster(self, options: _Options = None) -> dict:
         """Checks for an instance configuration before joining an InnoDB cluster."""
         command = "\n".join((
             f"result = dba.check_instance_configuration(options={options})",
-            f"assert result['status'] == 'ok'",
+            f"print(result)",
         ))
 
         host = self._executor.connection_details.host
@@ -319,12 +319,12 @@ class MySQLClusterClient:
 
         try:
             logger.debug(f"Checking for instance {host}:{port} config")
-            self._executor.execute_py(command)
+            result = self._executor.execute_py(command)
         except ExecutionError:
             logger.error(f"Failed to check for instance {host}:{port} config")
-            return False
+            raise
         else:
-            return True
+            return json.loads(result)
 
     def setup_instance_before_cluster(self, options: _Options = None) -> None:
         """Sets up an instance configuration before joining an InnoDB cluster."""

@@ -59,7 +59,7 @@ class TestLocalExecutor:
         try:
             executor.execute_py("syntax")
         except ExecutionError as e:
-            assert str(e) == ""
+            assert str(e) == "name 'syntax' is not defined"
 
         executor = build_local_executor(
             username="wrong_username",
