@@ -5,7 +5,7 @@ import os
 import threading
 import time
 from contextlib import contextmanager
-from typing import Any, Generator
+from typing import Any
 
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models import ConnectionDetails, VariableScope
@@ -47,7 +47,7 @@ def temp_process(query: str):
 
 
 @contextmanager
-def temp_variable(scope: VariableScope, name: str, new_value: Any) -> Generator:
+def temp_variable(scope: VariableScope, name: str, new_value: Any):
     """Context manager to run a piece of code with a variable changed."""
     executor = build_local_executor(
         username=os.environ.get("MYSQL_USERNAME"),

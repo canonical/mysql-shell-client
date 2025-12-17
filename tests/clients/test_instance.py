@@ -180,16 +180,33 @@ class TestInstanceClient:
             self._delete_user(client, user_1)
             self._delete_user(client, user_2)
 
-    def test_update_instance_user(self, client: MySQLInstanceClient):
-        """Test the updating of an instance user."""
+    def test_update_instance_user_password(self, client: MySQLInstanceClient):
+        """Test the updating of an instance user password."""
         instance_user = User("instance_user_update", "%")
 
         try:
-            client.create_instance_user(instance_user, "password")
-            client.update_instance_user(instance_user, "password_new")
+            client.create_instance_user(instance_user, password="password")
+            client.update_instance_user(instance_user, password="password_new")
 
             executor = build_local_executor(instance_user.username, "password_new")
             executor.check_connection()
+        finally:
+            self._delete_user(client, instance_user)
+
+    def test_update_instance_user_attributes(self, client: MySQLInstanceClient):
+        """Test the updating of an instance user attributes."""
+        old_attrs = {"key": "val_1"}
+        new_attrs = {"key": "val_2"}
+
+        instance_user = User("instance_user_update", "%", old_attrs)
+
+        try:
+            client.create_instance_user(instance_user, password="password")
+            client.update_instance_user(instance_user, password="password", attrs=new_attrs)
+
+            users = client.search_instance_users(instance_user.username)
+            assert len(users) > 0
+            assert users[0].attributes == new_attrs
         finally:
             self._delete_user(client, instance_user)
 
