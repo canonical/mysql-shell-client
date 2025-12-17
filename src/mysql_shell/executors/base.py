@@ -2,7 +2,7 @@
 # See LICENSE file for licensing details.
 
 from abc import ABC, abstractmethod
-from typing import Any, Sequence
+from typing import Sequence
 
 from ..models import ConnectionDetails
 
@@ -26,7 +26,7 @@ class BaseExecutor(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def execute_py(self, script: str, *, timeout: int | None = None) -> Any:
+    def execute_py(self, script: str, *, timeout: int | None = None) -> str:
         """Execute a Python script."""
         raise NotImplementedError()
 

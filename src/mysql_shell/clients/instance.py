@@ -8,9 +8,8 @@ from ..builders import StringQueryQuoter
 from ..executors import BaseExecutor
 from ..executors.errors import ExecutionError
 from ..models.account import Role, User
-from ..models.roles import InstanceRole
+from ..models.instance import InstanceRole, InstanceState
 from ..models.statement import LogType, VariableScope
-from ..models.status import InstanceStatus
 
 logger = logging.getLogger()
 
@@ -227,7 +226,7 @@ class MySQLInstanceClient:
         else:
             return [row["cluster_name"] for row in rows]
 
-    def get_instance_replication_state(self) -> InstanceStatus | None:
+    def get_instance_replication_state(self) -> InstanceState | None:
         """Gets the instance replication state."""
         query = (
             "SELECT member_state "
@@ -244,7 +243,9 @@ class MySQLInstanceClient:
         if not rows:
             return None
 
-        return InstanceStatus(rows[0]["member_state"])
+        state = rows[0]["member_state"]
+        state = InstanceState(state) if state else None
+        return state
 
     def get_instance_replication_role(self) -> InstanceRole | None:
         """Gets the instance replication role."""
@@ -263,7 +264,9 @@ class MySQLInstanceClient:
         if not rows:
             return None
 
-        return InstanceRole(rows[0]["member_role"])
+        role = rows[0]["member_role"]
+        role = InstanceRole(role) if role else None
+        return role
 
     def get_instance_variable(self, scope: VariableScope, name: str) -> Any | None:
         """Gets an instance variable by scope and name."""

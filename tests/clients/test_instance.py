@@ -9,9 +9,8 @@ from mysql_shell.builders import StringQueryQuoter
 from mysql_shell.clients import MySQLInstanceClient
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models.account import Role, User
-from mysql_shell.models.roles import InstanceRole
+from mysql_shell.models.instance import InstanceRole, InstanceState
 from mysql_shell.models.statement import LogType, VariableScope
-from mysql_shell.models.status import InstanceStatus
 
 from ..helpers import (
     TEST_CLUSTER_NAME,
@@ -213,7 +212,7 @@ class TestInstanceClient:
 
     def test_get_instance_replication_state(self, client: MySQLInstanceClient):
         """Test the fetching of the instance replication state."""
-        assert client.get_instance_replication_state() == InstanceStatus.ONLINE
+        assert client.get_instance_replication_state() == InstanceState.ONLINE
 
     def test_get_instance_replication_role(self, client: MySQLInstanceClient):
         """Test the fetching of the instance replication role."""

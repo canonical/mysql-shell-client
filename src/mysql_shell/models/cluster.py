@@ -30,6 +30,13 @@ class ClusterGlobalStatus(str, Enum):
     INVALIDATED = "INVALIDATED"
 
 
+class ClusterRole(str, Enum):
+    """MySQL cluster roles."""
+
+    PRIMARY = "PRIMARY"
+    REPLICA = "REPLICA"
+
+
 class ClusterStatus(str, Enum):
     """MySQL cluster statuses.
 
@@ -48,19 +55,3 @@ class ClusterStatus(str, Enum):
     ERROR = "ERROR"
     UNREACHABLE = "UNREACHABLE"
     UNKNOWN = "UNKNOWN"
-
-
-class InstanceStatus(str, Enum):
-    """MySQL instance statuses.
-
-    There is a slight discrepancy between the possible instance statuses reported
-    by different MySQL mechanisms, this list contains the common ones across them.
-    - https://dev.mysql.com/doc/refman/8.0/en/group-replication-server-states.html
-    - https://dev.mysql.com/doc/mysql-shell/8.0/en/monitoring-innodb-cluster.html
-    """
-
-    ONLINE = "ONLINE"
-    RECOVERING = "RECOVERING"
-    OFFLINE = "OFFLINE"
-    ERROR = "ERROR"
-    UNREACHABLE = "UNREACHABLE"

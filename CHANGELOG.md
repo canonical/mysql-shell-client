@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Fixed
+- Rename InstanceStatus to InstanceState.
+- Crash when querying instance role and instance state.
+- Avoid parsing stderr within LocalExecutor class.
 
 ## [0.4.2][changes-0.4.2] - 2025-12-15
 ### Fixed
