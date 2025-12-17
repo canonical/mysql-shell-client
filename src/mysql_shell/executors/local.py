@@ -109,7 +109,7 @@ class LocalExecutor(BaseExecutor):
         except subprocess.TimeoutExpired:
             raise ExecutionError()
 
-    def execute_py(self, script: str, *, timeout: int | None = None) -> Any:
+    def execute_py(self, script: str, *, timeout: int | None = None) -> str:
         """Execute a Python script.
 
         Arguments:

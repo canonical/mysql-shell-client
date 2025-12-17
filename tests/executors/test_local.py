@@ -67,7 +67,7 @@ class TestLocalExecutor:
         )
 
         try:
-            executor.check_connection()
+            executor.execute_py("pass")
         except ExecutionError as e:
             assert str(e).startswith("MySQL Error 1045 (28000): Access denied for user")
 
@@ -94,6 +94,6 @@ class TestLocalExecutor:
         )
 
         try:
-            executor.check_connection()
+            executor.execute_sql("SELECT 1")
         except ExecutionError as e:
             assert str(e).startswith("MySQL Error 1045 (28000): Access denied for user")
