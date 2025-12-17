@@ -2,7 +2,7 @@
 # See LICENSE file for licensing details.
 
 from .account import *
+from .cluster import *
 from .connection import *
-from .roles import *
+from .instance import *
 from .statement import *
-from .status import *
