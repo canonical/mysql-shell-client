@@ -4,7 +4,7 @@
 import json
 import re
 import subprocess
-from typing import Any, Generator
+from typing import Generator
 
 from ..models import ConnectionDetails
 from .base import BaseExecutor
@@ -41,38 +41,44 @@ class LocalExecutor(BaseExecutor):
                 f"--user={self._conn_details.username}",
             ]
 
-    def _parse_error(self, output: str, key: str) -> Any:
-        """Parse the error message."""
-        for log in self._iter_output(output):
-            if log.startswith("MySQL Error"):
-                return log
+    def _parse_error(self, output: str) -> dict:
+        """Parse the execution error."""
+        error = next(self._iter_output(output, "error"), None)
+        if not error:
+            error = {}
 
-            log = json.loads(log)
-            msg = log.get(key)
-            if not isinstance(msg, str) or msg.strip():
-                return msg
+        return error
 
-        return ""
+    def _parse_output_py(self, output: str) -> str:
+        """Parse the Python execution output."""
+        result = next(self._iter_output(output, "info"), None)
+        if not result:
+            result = "{}"
 
-    def _parse_output(self, output: str, key: str) -> Any:
-        """Parse the error message."""
-        for log in self._iter_output(output):
-            log = json.loads(log)
-            msg = log.get(key)
-            if not isinstance(msg, str) or msg.strip():
-                return msg
+        return result
 
-        return {}
+    def _parse_output_sql(self, output: str) -> list:
+        """Parse the SQL execution output."""
+        result = next(self._iter_output(output, "rows"), None)
+        if not result:
+            result = []
+
+        return result
 
     @staticmethod
-    def _iter_output(output: str) -> Generator:
+    def _iter_output(output: str, key: str) -> Generator:
         """Iterates over the log lines in reversed order."""
         logs = output.split("\n")
 
         # MySQL Shell always prints prompts and warnings first
         for log in reversed(logs):
-            if log:
-                yield log
+            if not log:
+                continue
+
+            log = json.loads(log)
+            val = log.get(key)
+            if not isinstance(val, str) or val.strip():
+                yield val
 
     @staticmethod
     def _strip_password(error: subprocess.SubprocessError):
@@ -100,11 +106,10 @@ class LocalExecutor(BaseExecutor):
             subprocess.check_output(
                 command,
                 input=self._conn_details.password,
-                stderr=subprocess.STDOUT,
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output, "error")
+            err = self._parse_error(exc.output)
             raise ExecutionError(err)
         except subprocess.TimeoutExpired:
             raise ExecutionError()
@@ -137,16 +142,15 @@ class LocalExecutor(BaseExecutor):
                 command,
                 timeout=timeout,
                 input=self._conn_details.password,
-                stderr=subprocess.STDOUT,
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output, "error")
+            err = self._parse_error(exc.output)
             raise ExecutionError(err)
         except subprocess.TimeoutExpired:
             raise ExecutionError()
         else:
-            return self._parse_output(output, "info")
+            return self._parse_output_py(output)
 
     def execute_sql(self, script: str, *, timeout: int | None = None) -> list[dict]:
         """Execute a SQL script.
@@ -171,15 +175,14 @@ class LocalExecutor(BaseExecutor):
                 command,
                 timeout=timeout,
                 input=self._conn_details.password,
-                stderr=subprocess.STDOUT,
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output, "error")
+            err = self._parse_error(exc.output)
             exc = self._strip_password(exc)
             raise ExecutionError(err) from exc
         except subprocess.TimeoutExpired as exc:
             exc = self._strip_password(exc)
             raise ExecutionError() from exc
         else:
-            return self._parse_output(output, "rows")
+            return self._parse_output_sql(output)
