@@ -244,7 +244,9 @@ class MySQLInstanceClient:
         if not rows:
             return None
 
-        return InstanceStatus(rows[0]["member_state"])
+        state = rows[0]["member_state"]
+        state = InstanceStatus(state) if state else None
+        return state
 
     def get_instance_replication_role(self) -> InstanceRole | None:
         """Gets the instance replication role."""
@@ -263,7 +265,9 @@ class MySQLInstanceClient:
         if not rows:
             return None
 
-        return InstanceRole(rows[0]["member_role"])
+        role = rows[0]["member_role"]
+        role = InstanceRole(role) if role else None
+        return role
 
     def get_instance_variable(self, scope: VariableScope, name: str) -> Any | None:
         """Gets an instance variable by scope and name."""
