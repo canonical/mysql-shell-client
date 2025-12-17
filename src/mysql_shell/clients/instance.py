@@ -1,8 +1,9 @@
 # Copyright 2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
+import json
 import logging
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from ..builders import StringQueryQuoter
 from ..executors import BaseExecutor
@@ -13,7 +14,7 @@ from ..models.statement import LogType, VariableScope
 
 logger = logging.getLogger()
 
-_Attributes = Mapping[str, str] | None
+_Attrs = Mapping[str, str] | None
 
 
 class MySQLInstanceClient:
@@ -140,14 +141,21 @@ class MySQLInstanceClient:
             logger.error("Failed to delete instance users")
             raise
 
-    def update_instance_user(self, user: User, password: str) -> None:
-        """Updates an instance user with the provided password."""
-        query = "ALTER USER {username}@{hostname} IDENTIFIED BY {password}"
+    def update_instance_user(self, user: User, password: str = None, attrs: _Attrs = None) -> None:
+        """Updates an instance user with the provided password and / or attributes."""
+        if not password and not attrs:
+            raise ValueError("Either password or attrs must be provided")
+
+        query = "ALTER USER {username}@{hostname}"
         query = query.format(
             username=self._quoter.quote_value(user.username),
             hostname=self._quoter.quote_value(user.hostname),
-            password=self._quoter.quote_value(password),
         )
+
+        if password:
+            query += f" IDENTIFIED BY {self._quoter.quote_value(password)}"
+        if attrs:
+            query += f" ATTRIBUTE {self._quoter.quote_value(json.dumps(attrs))}"
 
         try:
             self._executor.execute_sql(query)
@@ -356,8 +364,37 @@ class MySQLInstanceClient:
             logger.error("Failed to reload instance TLS certificates")
             raise
 
-    def search_instance_connections(self, name_pattern: str) -> list[int]:
-        """Searches the instance connection IDs by name pattern."""
+    def search_instance_replication_members(
+        self,
+        roles: Sequence[InstanceRole] | None = None,
+        states: Sequence[InstanceState] | None = None,
+    ) -> list[str]:
+        """Searches the instance replication member IDs by role and/or state."""
+        if not roles:
+            roles = list(InstanceRole)
+        if not states:
+            states = list(InstanceState)
+
+        query = (
+            "SELECT member_id "
+            "FROM performance_schema.replication_group_members "
+            "WHERE member_role IN ({roles}) AND member_state IN ({states})"
+        )
+        query = query.format(
+            roles=", ".join([self._quoter.quote_value(role) for role in roles]),
+            states=", ".join([self._quoter.quote_value(state) for state in states]),
+        )
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error("Failed to search instance replication members")
+            raise
+        else:
+            return [row["member_id"] for row in rows]
+
+    def search_instance_connection_processes(self, name_pattern: str) -> list[int]:
+        """Searches the instance connection process IDs by name pattern."""
         query = (
             "SELECT processlist_id "
             "FROM performance_schema.threads "
@@ -435,7 +472,7 @@ class MySQLInstanceClient:
         else:
             return [Role.from_row(row["user"], row["host"]) for row in rows]
 
-    def search_instance_users(self, name_pattern: str, attrs: _Attributes = None) -> list[User]:
+    def search_instance_users(self, name_pattern: str, attrs: _Attrs = None) -> list[User]:
         """Searches the instance users by name pattern and attributes."""
         attr_filter = "attribute LIKE {string}"
         attr_substr = '%"{key}": "{val}"%'
