@@ -270,6 +270,21 @@ class TestInstanceClient:
         """Test the reloading of instance TLS certificates."""
         pass
 
+    def test_search_instance_replication_members(self, client: MySQLInstanceClient):
+        """Test the searching of instance replication members."""
+        members = client.search_instance_replication_members()
+        assert len(members) == 1
+
+        primary_members = client.search_instance_replication_members([InstanceRole.PRIMARY], [])
+        replica_members = client.search_instance_replication_members([InstanceRole.SECONDARY], [])
+        assert len(primary_members) == 1
+        assert len(replica_members) == 0
+
+        online_members = client.search_instance_replication_members([], [InstanceState.ONLINE])
+        offline_members = client.search_instance_replication_members([], [InstanceState.OFFLINE])
+        assert len(online_members) == 1
+        assert len(offline_members) == 0
+
     def test_search_instance_connections(self, client: MySQLInstanceClient):
         """Test the searching of instance connections given a name-pattern."""
         query = "DO SLEEP(10)"
@@ -278,8 +293,8 @@ class TestInstanceClient:
             process_ids = self._get_processes(client, query)
             assert len(process_ids) == 1
 
-            assert process_ids[0] in client.search_instance_connections("%")
-            assert process_ids[0] not in client.search_instance_connections("process_search")
+            assert process_ids[0] in client.search_instance_connection_processes("%")
+            assert process_ids[0] not in client.search_instance_connection_processes("search")
 
     def test_search_instance_databases(self, client: MySQLInstanceClient):
         """Test the searching of instance databases given a name-pattern."""
@@ -349,6 +364,6 @@ class TestInstanceClient:
             process_ids = self._get_processes(client, query)
             assert len(process_ids) == 1
 
-            assert process_ids[0] in client.search_instance_connections("%")
+            assert process_ids[0] in client.search_instance_connection_processes("%")
             client.stop_instance_processes(process_ids)
-            assert process_ids[0] not in client.search_instance_connections("%")
+            assert process_ids[0] not in client.search_instance_connection_processes("%")

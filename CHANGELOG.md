@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Added
+- Search replication members method to InstanceClient class.
 - Ability to update user attrs by the InstanceClient class.
 ### Fixed
 - Rename InstanceStatus to InstanceState.

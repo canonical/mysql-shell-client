@@ -3,7 +3,7 @@
 
 import json
 import logging
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from ..builders import StringQueryQuoter
 from ..executors import BaseExecutor
@@ -364,8 +364,37 @@ class MySQLInstanceClient:
             logger.error("Failed to reload instance TLS certificates")
             raise
 
-    def search_instance_connections(self, name_pattern: str) -> list[int]:
-        """Searches the instance connection IDs by name pattern."""
+    def search_instance_replication_members(
+        self,
+        roles: Sequence[InstanceRole] | None = None,
+        states: Sequence[InstanceState] | None = None,
+    ) -> list[str]:
+        """Searches the instance replication member IDs by role and/or state."""
+        if not roles:
+            roles = list(InstanceRole)
+        if not states:
+            states = list(InstanceState)
+
+        query = (
+            "SELECT member_id "
+            "FROM performance_schema.replication_group_members "
+            "WHERE member_role IN ({roles}) AND member_state IN ({states})"
+        )
+        query = query.format(
+            roles=", ".join([self._quoter.quote_value(role) for role in roles]),
+            states=", ".join([self._quoter.quote_value(state) for state in states]),
+        )
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error("Failed to search instance replication members")
+            raise
+        else:
+            return [row["member_id"] for row in rows]
+
+    def search_instance_connection_processes(self, name_pattern: str) -> list[int]:
+        """Searches the instance connection process IDs by name pattern."""
         query = (
             "SELECT processlist_id "
             "FROM performance_schema.threads "
