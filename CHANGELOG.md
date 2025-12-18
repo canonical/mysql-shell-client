@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Fixed
+- Instance-label fetching within InstanceClient class.
 
 ## [0.5.0][changes-0.5.0] - 2025-12-17
 ### Added

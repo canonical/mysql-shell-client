@@ -217,11 +217,13 @@ class TestInstanceClient:
 
     def test_get_cluster_instance_label(self, client: MySQLInstanceClient):
         """Test the fetching of the cluster instance label."""
-        pass
+        label = client.get_cluster_instance_label()
+        assert label.endswith(":3306")
 
     def test_get_cluster_instance_labels(self, client: MySQLInstanceClient):
         """Test the fetching of all the cluster instance labels."""
-        pass
+        labels = client.get_cluster_instance_labels(TEST_CLUSTER_NAME)
+        assert len(labels) == 1
 
     def test_get_cluster_labels(self, client: MySQLInstanceClient):
         """Test the fetching of all the cluster labels."""

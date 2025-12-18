@@ -208,7 +208,11 @@ class MySQLInstanceClient:
         query = (
             "SELECT instance_name "
             "FROM mysql_innodb_cluster_metadata.instances "
-            "WHERE cluster_name = {cluster_name}"
+            "WHERE cluster_id IN ( "
+            "   SELECT cluster_id "
+            "   FROM mysql_innodb_cluster_metadata.clusters "
+            "   WHERE cluster_name = {cluster_name} "
+            ")"
         )
         query = query.format(
             cluster_name=self._quoter.quote_value(cluster_name),
