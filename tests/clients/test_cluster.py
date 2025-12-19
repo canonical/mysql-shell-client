@@ -44,6 +44,11 @@ class TestClusterClient:
         host = rows[0]["address"]
         return host
 
+    def test_fetch_cluster_primary(self, client: MySQLClusterClient):
+        """Test the fetching of the cluster primary."""
+        address = client.fetch_cluster_primary()
+        assert address == "0.0.0.0:3306"
+
     def test_fetch_cluster_status(self, client: MySQLClusterClient):
         """Test the fetching of the cluster status."""
         status = client.fetch_cluster_status(TEST_CLUSTER_NAME)

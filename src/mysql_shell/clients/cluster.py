@@ -45,6 +45,23 @@ class MySQLClusterClient:
             logger.error(f"Failed to destroy cluster {cluster_name}")
             raise
 
+    def fetch_cluster_primary(self) -> str:
+        """Fetches an InnoDB cluster primary."""
+        command = "\n".join((
+            "shell.connect_to_primary()",
+            "host = str(shell.parse_uri(session.uri)['host'])",
+            "port = str(shell.parse_uri(session.uri)['port'])",
+            "print(host + ':' + port)",
+        ))
+
+        try:
+            result = self._executor.execute_py(command)
+        except ExecutionError:
+            logger.error("Failed to fetch cluster primary")
+            raise
+        else:
+            return result
+
     def fetch_cluster_status(self, cluster_name: str, extended: bool = False) -> dict:
         """Fetches an InnoDB cluster status."""
         command = "\n".join((
