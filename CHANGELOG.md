@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Added
+- Fetch cluster-primary method to ClusterClient class.
+
 ## [0.5.1][changes-0.5.1] - 2025-12-18
 ### Fixed
 - Instance-label fetching within InstanceClient class.
