@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Added
+- Logging query builder class.
 ### Fixed
 - Search-processes method within InstanceClient class.
 - Stop-processes method within InstanceClient class.
