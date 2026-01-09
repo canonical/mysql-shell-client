@@ -402,7 +402,10 @@ class MySQLInstanceClient:
         query = (
             "SELECT processlist_id "
             "FROM performance_schema.threads "
-            "WHERE connection_type IS NOT NULL AND name LIKE {name_pattern}"
+            "WHERE "
+            "   processlist_id != CONNECTION_ID() AND "
+            "   connection_type IS NOT NULL AND "
+            "   name LIKE {name_pattern}"
         )
         query = query.format(
             name_pattern=self._quoter.quote_value(name_pattern),
