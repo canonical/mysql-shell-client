@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+
+## [0.6.0][changes-0.6.0] - 2026-01-12
 ### Added
 - Logging query builder class.
 ### Fixed
@@ -80,5 +82,6 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 [changes-0.4.2]: https://github.com/canonical/mysql-shell-client/compare/0.4.1...0.4.2
 [changes-0.5.0]: https://github.com/canonical/mysql-shell-client/compare/0.4.2...0.5.0
 [changes-0.5.1]: https://github.com/canonical/mysql-shell-client/compare/0.5.0...0.5.1
+[changes-0.6.0]: https://github.com/canonical/mysql-shell-client/compare/0.5.1...0.6.0
 [docs-changelog]: https://keepachangelog.com/en/1.0.0/
 [docs-semver]: https://semver.org/spec/v2.0.0.html
