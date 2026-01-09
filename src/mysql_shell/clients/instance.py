@@ -402,7 +402,10 @@ class MySQLInstanceClient:
         query = (
             "SELECT processlist_id "
             "FROM performance_schema.threads "
-            "WHERE connection_type IS NOT NULL AND name LIKE {name_pattern}"
+            "WHERE "
+            "   processlist_id != CONNECTION_ID() AND "
+            "   connection_type IS NOT NULL AND "
+            "   name LIKE {name_pattern}"
         )
         query = query.format(
             name_pattern=self._quoter.quote_value(name_pattern),
@@ -526,8 +529,11 @@ class MySQLInstanceClient:
             logger.error("Failed to stop instance replication")
             raise
 
-    def stop_instance_processes(self, process_ids: list[int]) -> None:
+    def stop_instance_processes(self, process_ids: Sequence[int]) -> None:
         """Kills the instances processes by ID."""
+        if not process_ids:
+            return
+
         query = "KILL CONNECTION {id}"
         queries = [query.format(id=self._quoter.quote_value(pid)) for pid in process_ids]
         queries = ";".join(queries)

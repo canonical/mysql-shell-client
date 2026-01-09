@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Fixed
+- Search-processes method within InstanceClient class.
+- Stop-processes method within InstanceClient class.
+
 ## [0.5.1][changes-0.5.1] - 2025-12-18
 ### Fixed
 - Instance-label fetching within InstanceClient class.

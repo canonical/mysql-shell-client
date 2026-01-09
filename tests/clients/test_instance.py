@@ -360,8 +360,9 @@ class TestInstanceClient:
 
     def test_stop_instance_processes(self, client: MySQLInstanceClient):
         """Test the stopping of processes."""
-        query = "DO SLEEP(10)"
+        client.stop_instance_processes([])
 
+        query = "DO SLEEP(10)"
         with temp_process(query):
             process_ids = self._get_processes(client, query)
             assert len(process_ids) == 1
