@@ -16,7 +16,11 @@ class CharmLoggingQueryBuilder(BaseLoggingQueryBuilder):
         self._quoter = StringQueryQuoter()
 
     def build_logs_flushing_query(self, logs: Sequence[LogType] | None = None) -> str:
-        """Builds the logs flushing query."""
+        """Builds the logs flushing query.
+
+        Arguments:
+            logs: a sequence of LogTypes to flush. If None, flush all
+        """
         binlog_query = "SET @@SESSION.sql_log_bin = {value}"
 
         if not logs:
