@@ -10,7 +10,7 @@ from ..executors import BaseExecutor
 from ..executors.errors import ExecutionError
 from ..models.account import Role, User
 from ..models.instance import InstanceRole, InstanceState
-from ..models.statement import LogType, VariableScope
+from ..models.statement import VariableScope
 
 logger = logging.getLogger()
 
@@ -162,27 +162,6 @@ class MySQLInstanceClient:
         except ExecutionError:
             logger.error(f"Failed to update instance user {user.username}.{user.hostname}")
             raise
-
-    def flush_instance_logs(self, logs: list[LogType]) -> None:
-        """Flushes the instance logs."""
-        if not logs:
-            return
-
-        bin_logging = self.get_instance_variable(VariableScope.SESSION, "sql_log_bin")
-
-        try:
-            self.set_instance_variable(VariableScope.SESSION, "sql_log_bin", "OFF")
-
-            query = "FLUSH {log} LOGS"
-            queries = [query.format(log=log.value) for log in logs]
-            queries = ";".join(queries)
-
-            self._executor.execute_sql(queries)
-        except ExecutionError:
-            logger.error("Failed to flush instance logs")
-            raise
-        finally:
-            self.set_instance_variable(VariableScope.SESSION, "sql_log_bin", bin_logging)
 
     def get_cluster_instance_label(self) -> str | None:
         """Gets the instance label within the cluster."""

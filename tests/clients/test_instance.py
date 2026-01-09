@@ -10,7 +10,7 @@ from mysql_shell.clients import MySQLInstanceClient
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models.account import Role, User
 from mysql_shell.models.instance import InstanceRole, InstanceState
-from mysql_shell.models.statement import LogType, VariableScope
+from mysql_shell.models.statement import VariableScope
 
 from ..helpers import (
     TEST_CLUSTER_NAME,
@@ -209,11 +209,6 @@ class TestInstanceClient:
             assert users[0].attributes == new_attrs
         finally:
             self._delete_user(client, instance_user)
-
-    def test_flush_instance_logs(self, client: MySQLInstanceClient):
-        """Test the flushing of a range of instance logs."""
-        client.flush_instance_logs([])
-        client.flush_instance_logs([LogType.GENERAL, LogType.ERROR])
 
     def test_get_cluster_instance_label(self, client: MySQLInstanceClient):
         """Test the fetching of the cluster instance label."""
