@@ -65,12 +65,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        server_version:
-          - "8.0"
-          # - "8.4"
-        shell_version:
-          - "8.0.44+dfsg-0ubuntu0.24.04.1~ppa1"
-          # - "8.4.7+dfsg-0ubuntu0.24.04.1~ppa1"
+        include:
+          # List of supported versions by MySQL Shell
+          # https://www.mysql.com/support/supportedplatforms/compatibility.html
+          - server: { version: "8.0" }
+            shell:  { version: "8.0.44+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.0" }
+          - server: { version: "8.0" }
+            shell:  { version: "8.4.7+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.4" }
+          - server: { version: "8.4" }
+            shell:  { version: "8.4.7+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.4" }
     env:
       MYSQL_DATABASE: test
       MYSQL_USERNAME: root
@@ -78,7 +81,7 @@ jobs:
       MYSQL_SHELL_PATH: mysqlsh
     services:
       mysql:
-        image: mysql:${{ matrix.server_version }}
+        image: mysql:${{ matrix.server.version }}
         ports:
           - 3306:3306
         env:
@@ -89,9 +92,9 @@ jobs:
         uses: actions/checkout@v5
       - name: "Install binaries"
         run: |
-          sudo add-apt-repository ppa:data-platform/mysql-shell-8.0
+          sudo add-apt-repository ppa:${{ matrix.shell.archive }}
           sudo apt update
-          sudo apt install mysql-shell=${{ matrix.shell_version }}
+          sudo apt install mysql-shell=${{ matrix.shell.version }}
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
