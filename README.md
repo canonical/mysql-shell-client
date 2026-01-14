@@ -12,12 +12,14 @@ in addition to a set of predefined queries to cover most of the common use-cases
 
 ## 🧑‍💻 Usage
 
-1. Install the package from PyPi:
+1. [Install MySQL Shell].
+
+2. Install the package from PyPi:
    ```shell
    pip install mysql-shell-client
    ```
 
-2. Import and build the executors:
+3. Import and build the executors:
    ```python
    from mysql_shell.executors import LocalExecutor
    from mysql_shell.models import ConnectionDetails
@@ -39,7 +41,7 @@ in addition to a set of predefined queries to cover most of the common use-cases
    instance_executor = LocalExecutor(instance_conn, "mysqlsh")
    ```
 
-3. Import and build the query builders **[optional]**:
+4. Import and build the query builders **[optional]**:
    ```python
    from mysql_shell.builders import CharmLockingQueryBuilder
 
@@ -49,14 +51,20 @@ in addition to a set of predefined queries to cover most of the common use-cases
    rows = instance_executor.execute_sql(query)
    ```
 
-4. Import and build the clients:
+5. Import and build the quoter:
+   ```python
+   from mysql_shell.builders.quoting import StringQueryQuoter
+
+   quoter = StringQueryQuoter()
+   ```
+
+6. Import and build the clients:
    ```python
    from mysql_shell.clients import MySQLClusterClient, MySQLInstanceClient
    
-   cluster_client = MySQLClusterClient(cluster_executor)
-   instance_client = MySQLInstanceClient(instance_executor)
+   cluster_client = MySQLClusterClient(cluster_executor, quoter)
+   instance_client = MySQLInstanceClient(instance_executor, quoter)
    ```
-
 
 ## 🔧 Development
 
@@ -99,6 +107,7 @@ Commits can be tagged to create releases of the package, in order to do so:
 3. Commit + push the changes.
 4. Trigger the [release workflow][github-workflows].
 
+[Install MySQL Shell]: https://dev.mysql.com/downloads/shell/
 
 [apache-license-badge]: https://img.shields.io/badge/License-Apache%202.0-blue.svg
 [apache-license-link]: https://github.com/canonical/mysql-shell-client/blob/main/LICENSE
