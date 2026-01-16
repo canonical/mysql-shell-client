@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Fixed
+- Search-members method within InstanceClient class.
 
 ## [0.6.0][changes-0.6.0] - 2026-01-12
 ### Added
