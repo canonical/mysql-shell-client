@@ -352,20 +352,32 @@ class MySQLInstanceClient:
         roles: Sequence[InstanceRole] | None = None,
         states: Sequence[InstanceState] | None = None,
     ) -> list[str]:
-        """Searches the instance replication member IDs by role and/or state."""
+        """Searches the instance replication member IDs by role or state."""
+        if roles and states:
+            raise ValueError("Only one of the properties must be provided")
+
+        roles_filter = "(member_role IN ({roles}))"
+        states_filter = "(member_state IN ({states}))"
+
         if not roles:
             roles = list(InstanceRole)
+            roles_filter = "(member_role IN ({roles}) OR member_role IS NULL)"
         if not states:
             states = list(InstanceState)
+            states_filter = "(member_state IN ({states}) OR member_state IS NULL)"
 
         query = (
             "SELECT member_id "
             "FROM performance_schema.replication_group_members "
-            "WHERE member_role IN ({roles}) AND member_state IN ({states})"
+            "WHERE {roles_filter} AND {states_filter}"
         )
         query = query.format(
-            roles=", ".join([self._quoter.quote_value(role) for role in roles]),
-            states=", ".join([self._quoter.quote_value(state) for state in states]),
+            roles_filter=roles_filter.format(
+                roles=", ".join([self._quoter.quote_value(role) for role in roles]),
+            ),
+            states_filter=states_filter.format(
+                states=", ".join([self._quoter.quote_value(state) for state in states]),
+            ),
         )
 
         try:
