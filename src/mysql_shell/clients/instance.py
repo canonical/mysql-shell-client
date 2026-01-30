@@ -44,6 +44,19 @@ class MySQLInstanceClient:
         else:
             return any(row["work_completed"] < row["work_estimated"] for row in rows)
 
+    def create_instance_database(self, database: str) -> None:
+        """Creates a new instance database."""
+        query = "CREATE DATABASE {database}"
+        query = query.format(
+            database=self._quoter.quote_identifier(database),
+        )
+
+        try:
+            self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error(f"Failed to create instance database {database}")
+            raise
+
     def create_instance_role(self, role: Role, roles: list[str] = None) -> None:
         """Creates a new instance role."""
         if not roles:
@@ -51,15 +64,15 @@ class MySQLInstanceClient:
         else:
             granting_query = "GRANT {roles} TO {rolename}@{hostname}"
             granting_query = granting_query.format(
-                rolename=self._quoter.quote_value(role.rolename),
-                hostname=self._quoter.quote_value(role.hostname),
+                rolename=self._quoter.quote_identifier(role.rolename),
+                hostname=self._quoter.quote_identifier(role.hostname),
                 roles=", ".join(self._quoter.quote_value(r) for r in roles),
             )
 
         creation_query = "CREATE ROLE {rolename}@{hostname}"
         creation_query = creation_query.format(
-            rolename=self._quoter.quote_value(role.rolename),
-            hostname=self._quoter.quote_value(role.hostname),
+            rolename=self._quoter.quote_identifier(role.rolename),
+            hostname=self._quoter.quote_identifier(role.hostname),
         )
 
         queries = ";".join((
@@ -80,8 +93,8 @@ class MySQLInstanceClient:
         else:
             granting_query = "GRANT {roles} TO {username}@{hostname}"
             granting_query = granting_query.format(
-                username=self._quoter.quote_value(user.username),
-                hostname=self._quoter.quote_value(user.hostname),
+                username=self._quoter.quote_identifier(user.username),
+                hostname=self._quoter.quote_identifier(user.hostname),
                 roles=", ".join(self._quoter.quote_value(r) for r in roles),
             )
 
@@ -89,8 +102,8 @@ class MySQLInstanceClient:
             "CREATE USER {username}@{hostname} IDENTIFIED BY {password} ATTRIBUTE {attrs}"
         )
         creation_query = creation_query.format(
-            username=self._quoter.quote_value(user.username),
-            hostname=self._quoter.quote_value(user.hostname),
+            username=self._quoter.quote_identifier(user.username),
+            hostname=self._quoter.quote_identifier(user.hostname),
             password=self._quoter.quote_value(password),
             attrs=self._quoter.quote_value(user.serialize_attrs()),
         )
@@ -110,8 +123,8 @@ class MySQLInstanceClient:
         """Deletes an instance user if it exists."""
         query = "DROP USER IF EXISTS {username}@{hostname}"
         query = query.format(
-            username=self._quoter.quote_value(user.username),
-            hostname=self._quoter.quote_value(user.hostname),
+            username=self._quoter.quote_identifier(user.username),
+            hostname=self._quoter.quote_identifier(user.hostname),
         )
 
         try:
@@ -128,8 +141,8 @@ class MySQLInstanceClient:
         for user in users:
             queries.append(
                 query.format(
-                    username=self._quoter.quote_value(user.username),
-                    hostname=self._quoter.quote_value(user.hostname),
+                    username=self._quoter.quote_identifier(user.username),
+                    hostname=self._quoter.quote_identifier(user.hostname),
                 )
             )
 
@@ -148,8 +161,8 @@ class MySQLInstanceClient:
 
         query = "ALTER USER {username}@{hostname}"
         query = query.format(
-            username=self._quoter.quote_value(user.username),
-            hostname=self._quoter.quote_value(user.hostname),
+            username=self._quoter.quote_identifier(user.username),
+            hostname=self._quoter.quote_identifier(user.hostname),
         )
 
         if password:

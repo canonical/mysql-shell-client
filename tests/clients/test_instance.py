@@ -37,9 +37,19 @@ class TestInstanceClient:
         return MySQLInstanceClient(executor, StringQueryQuoter())
 
     @staticmethod
+    def _delete_database(client: MySQLInstanceClient, database: str):
+        """Get the granted roles for a user."""
+        query = "DROP DATABASE IF EXISTS `{database}`"
+        query = query.format(
+            database=database,
+        )
+
+        client._executor.execute_sql(query)
+
+    @staticmethod
     def _delete_user(client: MySQLInstanceClient, user: User):
         """Get the granted roles for a user."""
-        query = "DROP USER IF EXISTS '{username}'@'{hostname}'"
+        query = "DROP USER IF EXISTS `{username}`@`{hostname}`"
         query = query.format(
             username=user.username,
             hostname=user.hostname,
@@ -50,7 +60,7 @@ class TestInstanceClient:
     @staticmethod
     def _delete_role(client: MySQLInstanceClient, role: Role):
         """Get the granted roles for a user."""
-        query = "DROP ROLE IF EXISTS '{rolename}'@'{hostname}'"
+        query = "DROP ROLE IF EXISTS `{rolename}`@`{hostname}`"
         query = query.format(
             rolename=role.rolename,
             hostname=role.hostname,
@@ -92,6 +102,17 @@ class TestInstanceClient:
     def test_check_work_ongoing(self, client: MySQLInstanceClient):
         """Test the checking of instance work."""
         assert not client.check_work_ongoing("%")
+
+    def test_create_instance_database(self, client: MySQLInstanceClient):
+        """Test the creation of an instance database."""
+        database = "instance_database_create"
+
+        try:
+            client.create_instance_database(database)
+            databases = client.search_instance_databases(database)
+            assert len(databases) > 0
+        finally:
+            self._delete_database(client, database)
 
     def test_create_instance_role_without_roles(self, client: MySQLInstanceClient):
         """Test the creation of an instance role."""
