@@ -1,6 +1,7 @@
 # Copyright 2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
+from functools import cache
 from typing import Any
 
 
@@ -37,10 +38,12 @@ class StringQueryQuoter:
 
         return value
 
+    @cache
     def quote_value(self, value: Any) -> str:
         """Quotes the provided value."""
         return f"'{self.escape(value)}'"
 
+    @cache
     def quote_identifier(self, name: str) -> str:
         """Quotes the provided identifier name."""
         return f"`{self.escape(name)}`"
