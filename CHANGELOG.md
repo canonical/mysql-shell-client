@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Added
+- Unbounded cache decorator within StringQueryQuoter class.
+- Instance roles update methods within AuthQueryBuilder classes.
+- Database creation method within InstanceClient class.
 - Methods to search, install, and uninstall components within InstanceClient class.
 
 ## [0.6.1][changes-0.6.1] - 2026-01-20
