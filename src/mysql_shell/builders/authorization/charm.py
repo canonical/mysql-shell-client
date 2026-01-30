@@ -44,12 +44,12 @@ class CharmAuthorizationQueryBuilder(BaseAuthorizationQueryBuilder):
     ):
         """Initialize the query builder."""
         self._quoter = StringQueryQuoter()
-        self._role_admin = self._quoter.quote_value(role_admin)
-        self._role_backup = self._quoter.quote_value(role_backup)
-        self._role_ddl = self._quoter.quote_value(role_ddl)
-        self._role_stats = self._quoter.quote_value(role_stats)
-        self._role_reader = self._quoter.quote_value(role_reader)
-        self._role_writer = self._quoter.quote_value(role_writer)
+        self._role_admin = self._quoter.quote_identifier(role_admin)
+        self._role_backup = self._quoter.quote_identifier(role_backup)
+        self._role_ddl = self._quoter.quote_identifier(role_ddl)
+        self._role_stats = self._quoter.quote_identifier(role_stats)
+        self._role_reader = self._quoter.quote_identifier(role_reader)
+        self._role_writer = self._quoter.quote_identifier(role_writer)
 
     def _build_instance_admin_role_queries(self) -> list[str]:
         """Builds the instance admin role creation queries."""
@@ -168,7 +168,7 @@ class CharmAuthorizationQueryBuilder(BaseAuthorizationQueryBuilder):
 
     def build_instance_router_role_query(self, rolename: str) -> str:
         """Builds the instance router role creation query."""
-        rolename = self._quoter.quote_value(rolename)
+        rolename = self._quoter.quote_identifier(rolename)
 
         return ";".join([
             self.ROLE_CREATION_QUERY.format(
@@ -196,10 +196,34 @@ class CharmAuthorizationQueryBuilder(BaseAuthorizationQueryBuilder):
             ),
         ])
 
+    def build_instance_reader_role_update_query(self, database: str) -> str:
+        """Builds the instance reader role granting query."""
+        database = self._quoter.quote_identifier(database)
+
+        return ";".join([
+            self.PRIV_GRANTING_QUERY.format(
+                privileges=", ".join(["SELECT"]),
+                rolename=self._role_reader,
+                database=database,
+            ),
+        ])
+
+    def build_instance_writer_role_update_query(self, database: str) -> str:
+        """Builds the instance writer role granting query."""
+        database = self._quoter.quote_identifier(database)
+
+        return ";".join([
+            self.PRIV_GRANTING_QUERY.format(
+                privileges=", ".join(["SELECT", "INSERT", "DELETE", "UPDATE"]),
+                rolename=self._role_writer,
+                database=database,
+            ),
+        ])
+
     def build_database_admin_role_query(self, rolename: str, database: str) -> str:
         """Builds the database admin role creation query."""
         database = self._quoter.quote_identifier(database)
-        rolename = self._quoter.quote_value(rolename)
+        rolename = self._quoter.quote_identifier(rolename)
 
         return ";".join([
             self.ROLE_CREATION_QUERY.format(

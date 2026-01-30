@@ -129,6 +129,46 @@ class TestCharmAuthorizationQueryBuilder:
             self._delete_role(executor, Role("role_reader"))
             self._delete_role(executor, Role("role_writer"))
 
+    def test_instance_reader_role_update_query(self, executor: LocalExecutor):
+        """Test the updating of an instance reader role."""
+        builder = CharmAuthorizationQueryBuilder(
+            role_admin="role_admin",
+            role_backup="role_backup",
+            role_ddl="role_ddl",
+            role_stats="role_stats",
+            role_reader="role_reader",
+            role_writer="role_writer",
+        )
+
+        try:
+            executor.execute_sql("CREATE DATABASE IF NOT EXISTS test")
+            executor.execute_sql(f"CREATE ROLE role_reader")
+
+            query = builder.build_instance_reader_role_update_query("test")
+            _____ = executor.execute_sql(query)
+        finally:
+            self._delete_role(executor, Role("role_reader"))
+
+    def test_instance_writer_role_update_query(self, executor: LocalExecutor):
+        """Test the updating of an instance writer role."""
+        builder = CharmAuthorizationQueryBuilder(
+            role_admin="role_admin",
+            role_backup="role_backup",
+            role_ddl="role_ddl",
+            role_stats="role_stats",
+            role_reader="role_reader",
+            role_writer="role_writer",
+        )
+
+        try:
+            executor.execute_sql("CREATE DATABASE IF NOT EXISTS test")
+            executor.execute_sql("CREATE ROLE role_writer")
+
+            query = builder.build_instance_writer_role_update_query("test")
+            _____ = executor.execute_sql(query)
+        finally:
+            self._delete_role(executor, Role("role_writer"))
+
     def test_database_admin_role_query(self, executor: LocalExecutor):
         """Test the creation of a database admin role."""
         builder = CharmAuthorizationQueryBuilder(

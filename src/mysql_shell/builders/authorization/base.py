@@ -18,6 +18,16 @@ class BaseAuthorizationQueryBuilder(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def build_instance_reader_role_update_query(self, database: str) -> str:
+        """Builds the instance reader role granting query."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def build_instance_writer_role_update_query(self, database: str) -> str:
+        """Builds the instance writer role granting query."""
+        raise NotImplementedError()
+
+    @abstractmethod
     def build_database_admin_role_query(self, rolename: str, database: str) -> str:
         """Builds the database admin role creation query."""
         raise NotImplementedError()
