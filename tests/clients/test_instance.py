@@ -282,6 +282,12 @@ class TestInstanceClient:
         assert len(online_members) == 1
         assert len(offline_members) == 0
 
+        with pytest.raises(ValueError):
+            client.search_instance_replication_members(
+                roles=[InstanceRole.PRIMARY],
+                states=[InstanceState.ONLINE],
+            )
+
     def test_search_instance_connections(self, client: MySQLInstanceClient):
         """Test the searching of instance connections given a name-pattern."""
         query = "DO SLEEP(10)"
