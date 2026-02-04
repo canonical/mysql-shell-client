@@ -263,6 +263,19 @@ class TestInstanceClient:
         finally:
             client.uninstall_instance_plugin("auth_socket")
 
+    def test_install_component(self, client: MySQLInstanceClient):
+        """Test the installation of a component."""
+        components = client.search_instance_components("%")
+        assert "file://component_validate_password" not in components
+
+        try:
+            client.install_instance_component("file://component_validate_password")
+
+            components = client.search_instance_components("%")
+            assert "file://component_validate_password" in components
+        finally:
+            client.uninstall_instance_component("file://component_validate_password")
+
     def test_reload_instance_certs(self, client: MySQLInstanceClient):
         """Test the reloading of instance TLS certificates."""
         pass
@@ -314,6 +327,11 @@ class TestInstanceClient:
         plugins = client.search_instance_plugins("%")
         assert "clone" in plugins
         assert "group_replication" in plugins
+
+    def test_search_instance_components(self, client: MySQLInstanceClient):
+        """Test the searching of instance components given a name-pattern."""
+        components = client.search_instance_components("%")
+        assert not components
 
     def test_search_instance_roles(self, client: MySQLInstanceClient):
         """Test the searching of instance roles given a name-pattern."""

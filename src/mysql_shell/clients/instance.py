@@ -337,6 +337,28 @@ class MySQLInstanceClient:
             logger.error(f"Failed to uninstall instance plugin with {name=}")
             raise
 
+    def install_instance_component(self, urn: str) -> None:
+        """Installs an instance component by urn."""
+        query = "INSTALL COMPONENT {component_urn}"
+        query = query.format(component_urn=self._quoter.quote_value(urn))
+
+        try:
+            self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error(f"Failed to install instance component with {urn=}")
+            raise
+
+    def uninstall_instance_component(self, urn: str) -> None:
+        """Uninstalls an instance component by urn."""
+        query = "UNINSTALL COMPONENT {component_urn}"
+        query = query.format(component_urn=self._quoter.quote_value(urn))
+
+        try:
+            self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error(f"Failed to uninstall instance component with {urn=}")
+            raise
+
     def reload_instance_certs(self) -> None:
         """Reloads TLS certificates."""
         query = "ALTER INSTANCE RELOAD TLS"
@@ -450,6 +472,26 @@ class MySQLInstanceClient:
             raise
         else:
             return [row["name"] for row in rows]
+
+    def search_instance_components(self, urn_pattern: str) -> list[str]:
+        """Searches the instance components by urn pattern."""
+        # fmt: off
+        query = (
+            "SELECT component_urn "
+            "FROM mysql.component "
+            "WHERE component_urn LIKE {urn_pattern}"
+        )
+        # fmt: on
+
+        query = query.format(urn_pattern=self._quoter.quote_value(urn_pattern))
+
+        try:
+            rows = self._executor.execute_sql(query)
+        except ExecutionError:
+            logger.error(f"Failed to search instance components with {urn_pattern=}")
+            raise
+        else:
+            return [row["component_urn"] for row in rows]
 
     def search_instance_roles(self, name_pattern: str) -> list[Role]:
         """Searches the instance roles by name pattern."""
