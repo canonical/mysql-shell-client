@@ -338,7 +338,7 @@ class MySQLInstanceClient:
             raise
 
     def install_instance_component(self, urn: str) -> None:
-        """Installs an instance component by urn."""
+        """Installs an instance component by URN."""
         query = "INSTALL COMPONENT {component_urn}"
         query = query.format(
             component_urn=self._quoter.quote_value(urn),
@@ -351,7 +351,7 @@ class MySQLInstanceClient:
             raise
 
     def uninstall_instance_component(self, urn: str) -> None:
-        """Uninstalls an instance component by urn."""
+        """Uninstalls an instance component by URN."""
         query = "UNINSTALL COMPONENT {component_urn}"
         query = query.format(
             component_urn=self._quoter.quote_value(urn),
@@ -478,7 +478,7 @@ class MySQLInstanceClient:
             return [row["name"] for row in rows]
 
     def search_instance_components(self, urn_pattern: str) -> list[str]:
-        """Searches the instance components by urn pattern."""
+        """Searches the instance components by URN pattern."""
         # fmt: off
         query = (
             "SELECT component_urn "

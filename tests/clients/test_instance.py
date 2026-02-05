@@ -329,7 +329,7 @@ class TestInstanceClient:
         assert "group_replication" in plugins
 
     def test_search_instance_components(self, client: MySQLInstanceClient):
-        """Test the searching of instance components given a name-pattern."""
+        """Test the searching of instance components given a URN pattern."""
         components = client.search_instance_components("%")
         assert not components
 
