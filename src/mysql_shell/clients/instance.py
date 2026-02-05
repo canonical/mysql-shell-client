@@ -340,7 +340,9 @@ class MySQLInstanceClient:
     def install_instance_component(self, urn: str) -> None:
         """Installs an instance component by urn."""
         query = "INSTALL COMPONENT {component_urn}"
-        query = query.format(component_urn=self._quoter.quote_value(urn))
+        query = query.format(
+            component_urn=self._quoter.quote_value(urn),
+        )
 
         try:
             self._executor.execute_sql(query)
@@ -351,7 +353,9 @@ class MySQLInstanceClient:
     def uninstall_instance_component(self, urn: str) -> None:
         """Uninstalls an instance component by urn."""
         query = "UNINSTALL COMPONENT {component_urn}"
-        query = query.format(component_urn=self._quoter.quote_value(urn))
+        query = query.format(
+            component_urn=self._quoter.quote_value(urn),
+        )
 
         try:
             self._executor.execute_sql(query)
