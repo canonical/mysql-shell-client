@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Added
+- Methods to search, install, and uninstall components within InstanceClient class.
 
 ## [0.6.1][changes-0.6.1] - 2026-01-20
 ### Fixed
