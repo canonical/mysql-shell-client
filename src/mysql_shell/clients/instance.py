@@ -400,10 +400,12 @@ class MySQLInstanceClient:
 
         if not roles:
             roles = list(InstanceRole)
-            roles_filter = "(member_role IN ({roles}) OR member_role IS NULL)"
+            roles_filter = "(member_role IN ({roles}) OR member_role IS NULL OR member_role = '')"
         if not states:
             states = list(InstanceState)
-            states_filter = "(member_state IN ({states}) OR member_state IS NULL)"
+            states_filter = (
+                "(member_state IN ({states}) OR member_state IS NULL OR member_state = '')"
+            )
 
         query = (
             "SELECT member_id "
