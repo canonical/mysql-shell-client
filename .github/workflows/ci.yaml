@@ -69,11 +69,11 @@ jobs:
           # List of supported versions by MySQL Shell
           # https://www.mysql.com/support/supportedplatforms/compatibility.html
           - server: { version: "8.0" }
-            shell:  { version: "8.0.44+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.0" }
+            shell:  { version: "8.0.45+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.0" }
           - server: { version: "8.0" }
-            shell:  { version: "8.4.7+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.4" }
+            shell:  { version: "8.4.8+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.4" }
           - server: { version: "8.4" }
-            shell:  { version: "8.4.7+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.4" }
+            shell:  { version: "8.4.8+dfsg-0ubuntu0.24.04.1~ppa1", archive: "data-platform/mysql-shell-8.4" }
     env:
       MYSQL_DATABASE: test
       MYSQL_USERNAME: root
