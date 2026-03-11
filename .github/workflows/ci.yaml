@@ -79,31 +79,29 @@ jobs:
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: root_pass
       MYSQL_SHELL_PATH: mysqlsh
-    services:
-      mysql:
-        image: mysql:${{ matrix.server.version }}
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
-          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_PASSWORD }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v6
+      - name: "Set up Compose"
+        uses: docker/setup-compose-action@v1
+      - name: "Set up Python"
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
       - name: "Install binaries"
         run: |
           sudo add-apt-repository ppa:${{ matrix.shell.archive }}
           sudo apt update
           sudo apt install mysql-shell=${{ matrix.shell.version }}
-      - name: "Set up Python"
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.10"
       - name: "Install poetry & tox"
         run: |
           pipx install poetry
           pipx install tox
+      - name: "Start services"
+        run: docker compose -f compose/mysql-${{ matrix.server.version }}.yaml up --wait
       - name: "Run tests"
         run: tox run -e integration
+      - name: "Stop services"
+        run: docker compose -f compose/mysql-${{ matrix.server.version }}.yaml down
       - name: "Upload Coverage to Codecov"
         uses: codecov/codecov-action@v5

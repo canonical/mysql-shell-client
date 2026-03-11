@@ -91,8 +91,8 @@ export MYSQL_USERNAME="root"
 export MYSQL_PASSWORD="root_pass"
 export MYSQL_SHELL_PATH="mysqlsh"
 
-podman-compose -f compose/mysql-8.0.yaml up --detach && tox -e integration
-podman-compose -f compose/mysql-8.0.yaml down
+sudo --preserve-env docker compose -f compose/mysql-8.0.yaml up --wait && tox -e integration
+sudo --preserve-env docker compose -f compose/mysql-8.0.yaml down
 ```
 
 ### Release
