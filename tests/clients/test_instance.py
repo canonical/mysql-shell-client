@@ -239,7 +239,7 @@ class TestInstanceClient:
     def test_get_cluster_instance_labels(self, client: MySQLInstanceClient):
         """Test the fetching of all the cluster instance labels."""
         labels = client.get_cluster_instance_labels(TEST_CLUSTER_NAME)
-        assert len(labels) == 1
+        assert len(labels) == 3
 
     def test_get_cluster_labels(self, client: MySQLInstanceClient):
         """Test the fetching of all the cluster labels."""
@@ -304,16 +304,16 @@ class TestInstanceClient:
     def test_search_instance_replication_members(self, client: MySQLInstanceClient):
         """Test the searching of instance replication members."""
         members = client.search_instance_replication_members()
-        assert len(members) == 1
+        assert len(members) == 3
 
         primary_members = client.search_instance_replication_members([InstanceRole.PRIMARY], [])
         replica_members = client.search_instance_replication_members([InstanceRole.SECONDARY], [])
         assert len(primary_members) == 1
-        assert len(replica_members) == 0
+        assert len(replica_members) == 2
 
         online_members = client.search_instance_replication_members([], [InstanceState.ONLINE])
         offline_members = client.search_instance_replication_members([], [InstanceState.OFFLINE])
-        assert len(online_members) == 1
+        assert len(online_members) == 3
         assert len(offline_members) == 0
 
         with pytest.raises(ValueError):
