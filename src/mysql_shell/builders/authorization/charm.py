@@ -8,7 +8,7 @@ from .base import BaseAuthorizationQueryBuilder
 class CharmAuthorizationQueryBuilder(BaseAuthorizationQueryBuilder):
     """Charm authorization query builder."""
 
-    ROLE_CREATION_QUERY = "CREATE ROLE {rolename}"
+    ROLE_CREATION_QUERY = "CREATE ROLE IF NOT EXISTS {rolename}"
     ROLE_GRANTING_QUERY = "GRANT {parents} TO {rolename}"
     PRIV_GRANTING_QUERY = "GRANT {privileges} ON {database}.* TO {rolename}"
 
