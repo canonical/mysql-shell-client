@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Fixed
+- Make role creation using CharmAuthorizationQueryBuilder idempotent
 
 ## [0.7.1][changes-0.7.1] - 2026-02-12
 ### Fixed
