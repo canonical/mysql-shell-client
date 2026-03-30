@@ -41,11 +41,16 @@ class LocalExecutor(BaseExecutor):
                 f"--user={self._conn_details.username}",
             ]
 
-    def _parse_error(self, output: str) -> dict:
+    def _parse_exception(self, exc: subprocess.CalledProcessError) -> str:
         """Parse the execution error."""
-        error = next(self._iter_output(output, "error"), None)
+        error = next(self._iter_output(exc.stdout, "error"), None)
         if not error:
-            error = {}
+            error = exc.stderr
+
+        if isinstance(error, str):
+            error = error
+        if isinstance(error, dict):
+            error = error.get("message")
 
         return error
 
@@ -103,13 +108,15 @@ class LocalExecutor(BaseExecutor):
         ]
 
         try:
-            subprocess.check_output(
+            subprocess.run(
                 command,
                 input=self._conn_details.password,
+                capture_output=True,
+                check=True,
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output)
+            err = self._parse_exception(exc)
             raise ExecutionError(err)
         except subprocess.TimeoutExpired:
             raise ExecutionError()
@@ -138,19 +145,21 @@ class LocalExecutor(BaseExecutor):
         ]
 
         try:
-            output = subprocess.check_output(
+            process = subprocess.run(
                 command,
                 timeout=timeout,
                 input=self._conn_details.password,
+                capture_output=True,
+                check=True,
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output)
+            err = self._parse_exception(exc)
             raise ExecutionError(err)
         except subprocess.TimeoutExpired:
             raise ExecutionError()
         else:
-            return self._parse_output_py(output)
+            return self._parse_output_py(process.stdout)
 
     def execute_sql(self, script: str, *, timeout: int | None = None) -> list[dict]:
         """Execute a SQL script.
@@ -171,18 +180,20 @@ class LocalExecutor(BaseExecutor):
         ]
 
         try:
-            output = subprocess.check_output(
+            process = subprocess.run(
                 command,
                 timeout=timeout,
                 input=self._conn_details.password,
+                capture_output=True,
+                check=True,
                 text=True,
             )
         except subprocess.CalledProcessError as exc:
-            err = self._parse_error(exc.output)
+            err = self._parse_exception(exc)
             exc = self._strip_password(exc)
             raise ExecutionError(err) from exc
         except subprocess.TimeoutExpired as exc:
             exc = self._strip_password(exc)
             raise ExecutionError() from exc
         else:
-            return self._parse_output_sql(output)
+            return self._parse_output_sql(process.stdout)
