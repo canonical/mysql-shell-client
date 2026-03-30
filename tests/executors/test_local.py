@@ -38,7 +38,7 @@ class TestLocalExecutor:
         try:
             executor.check_connection()
         except ExecutionError as e:
-            assert str(e) == str(None)
+            assert "Access denied for user" in str(e)
 
     def test_execute_py(self, executor: LocalExecutor):
         """Test the execution of Python scripts."""
@@ -56,7 +56,7 @@ class TestLocalExecutor:
         try:
             executor.execute_py("syntax")
         except ExecutionError as e:
-            assert str(e) == "name 'syntax' is not defined"
+            assert "name 'syntax' is not defined" in str(e)
 
         executor = build_local_executor(
             username="wrong_username",
@@ -66,7 +66,7 @@ class TestLocalExecutor:
         try:
             executor.execute_py("pass")
         except ExecutionError as e:
-            assert str(e) == str(None)
+            assert "Access denied for user" in str(e)
 
     def test_execute_sql(self, executor: LocalExecutor):
         """Test the execution of SQL scripts."""
@@ -83,7 +83,7 @@ class TestLocalExecutor:
         try:
             executor.execute_sql("SELECT")
         except ExecutionError as e:
-            assert str(e).startswith("You have an error in your SQL syntax")
+            assert "You have an error in your SQL syntax" in str(e)
 
         executor = build_local_executor(
             username="wrong_username",
@@ -93,4 +93,4 @@ class TestLocalExecutor:
         try:
             executor.execute_sql("SELECT 1")
         except ExecutionError as e:
-            assert str(e) == str(None)
+            assert "Access denied for user" in str(e)
