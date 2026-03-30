@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 
+## [0.8.1][changes-0.8.1] - 2026-03-30
+### Added
+- Standard error parsing to the LocalExecutor class.
+
 ## [0.8.0][changes-0.8.0] - 2026-03-23
 ### Fixed
 - Make role creation using CharmAuthorizationQueryBuilder idempotent
@@ -106,5 +110,6 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 [changes-0.7.0]: https://github.com/canonical/mysql-shell-client/compare/0.6.1...0.7.0
 [changes-0.7.1]: https://github.com/canonical/mysql-shell-client/compare/0.7.0...0.7.1
 [changes-0.8.0]: https://github.com/canonical/mysql-shell-client/compare/0.7.1...0.8.0
+[changes-0.8.1]: https://github.com/canonical/mysql-shell-client/compare/0.8.0...0.8.1
 [docs-changelog]: https://keepachangelog.com/en/1.0.0/
 [docs-semver]: https://semver.org/spec/v2.0.0.html
