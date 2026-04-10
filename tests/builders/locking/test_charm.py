@@ -98,7 +98,7 @@ class TestCharmLockingQueryBuilder:
 
         assert self._fetch_lock_instance(executor, task) is None
 
-    def test_reset_lock_query(self, executor: LocalExecutor):
+    def test_release_all_lock_query(self, executor: LocalExecutor):
         """Test the resetting of the table lock."""
         builder = CharmLockingQueryBuilder("mysql", "locking")
         task = CharmLockingQueryBuilder.INSTANCE_ADDITION_TASK
@@ -106,7 +106,7 @@ class TestCharmLockingQueryBuilder:
         acquire_query = builder.build_acquire_query(task, "mysql-1")
         executor.execute_sql(acquire_query)
 
-        reset_query = builder.build_reset_table_query()
+        reset_query = builder.build_release_all_query()
         executor.execute_sql(reset_query)
 
         assert self._fetch_lock_instance(executor, task) is None

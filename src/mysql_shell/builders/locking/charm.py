@@ -96,7 +96,7 @@ class CharmLockingQueryBuilder(BaseLockingQueryBuilder):
             status=self._quoter.quote_value("not-started"),
         )
 
-    def build_reset_table_query(self) -> str:
+    def build_release_all_query(self) -> str:
         """Builds the locking table reset query."""
         query = "UPDATE {table} SET status = {status}, executor = ''"
 
