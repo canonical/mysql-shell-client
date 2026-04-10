@@ -26,3 +26,8 @@ class BaseLockingQueryBuilder(ABC):
     def build_release_query(self, task: str, instance: str) -> str:
         """Builds the lock releasing query."""
         raise NotImplementedError()
+
+    @abstractmethod
+    def build_reset_table_query(self) -> str:
+        """Builds the locking table reset query."""
+        raise NotImplementedError()
