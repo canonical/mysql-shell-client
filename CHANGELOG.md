@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 
+## [0.9.0][changes-0.9.0] - 2026-04-13
+### Added
+- Build release all lock in BaseLockingQueryBuilder and CharmLockingQueryBuilder classes.
+
 ## [0.8.1][changes-0.8.1] - 2026-03-30
 ### Added
 - Standard error parsing to the LocalExecutor class.
@@ -111,5 +115,6 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 [changes-0.7.1]: https://github.com/canonical/mysql-shell-client/compare/0.7.0...0.7.1
 [changes-0.8.0]: https://github.com/canonical/mysql-shell-client/compare/0.7.1...0.8.0
 [changes-0.8.1]: https://github.com/canonical/mysql-shell-client/compare/0.8.0...0.8.1
+[changes-0.9.0]: https://github.com/canonical/mysql-shell-client/compare/0.8.1...0.9.0
 [docs-changelog]: https://keepachangelog.com/en/1.0.0/
 [docs-semver]: https://semver.org/spec/v2.0.0.html
