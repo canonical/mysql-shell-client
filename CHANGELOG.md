@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Added
+- Timeout argument to BaseExecutor classes.
+
 ### Fixed
+- Rename quoter and client classes.
 - Reduce logging level when failing to get cluster labels.
 
 ## [0.9.0][changes-0.9.0] - 2026-04-13
