@@ -14,9 +14,9 @@ from .errors import ExecutionError
 class LocalExecutor(BaseExecutor):
     """Local executor for the MySQL Shell."""
 
-    def __init__(self, conn_details: ConnectionDetails, shell_path: str):
+    def __init__(self, conn_details: ConnectionDetails, shell_path: str, timeout: int = 60):
         """Initialize the executor."""
-        super().__init__(conn_details, shell_path)
+        super().__init__(conn_details, shell_path, timeout)
 
     def _common_args(self) -> list[str]:
         """Return the list of common arguments."""
@@ -147,7 +147,7 @@ class LocalExecutor(BaseExecutor):
         try:
             process = subprocess.run(
                 command,
-                timeout=timeout,
+                timeout=timeout or self._timeout,
                 input=self._conn_details.password,
                 capture_output=True,
                 check=True,
@@ -182,7 +182,7 @@ class LocalExecutor(BaseExecutor):
         try:
             process = subprocess.run(
                 command,
-                timeout=timeout,
+                timeout=timeout or self._timeout,
                 input=self._conn_details.password,
                 capture_output=True,
                 check=True,
