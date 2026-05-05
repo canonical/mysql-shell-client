@@ -22,6 +22,9 @@ class ClusterClient:
 
     def create_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Creates an InnoDB cluster."""
+        if not options:
+            options = {}
+
         command = f"dba.create_cluster('{cluster_name}', {options})"
 
         try:
@@ -33,6 +36,9 @@ class ClusterClient:
 
     def destroy_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Destroys an InnoDB cluster."""
+        if not options:
+            options = {}
+
         command = "\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
             f"cluster.dissolve({options})",
@@ -54,7 +60,7 @@ class ClusterClient:
         ))
 
         try:
-            result = self._executor.execute_py(command, timeout=30)
+            result = self._executor.execute_py(command)
         except ExecutionError:
             logger.error("Failed to fetch cluster status")
             raise
@@ -79,6 +85,9 @@ class ClusterClient:
 
     def rescan_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Rescans an InnoDB cluster."""
+        if not options:
+            options = {}
+
         command = "\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
             f"cluster.rescan({options})",
@@ -93,6 +102,9 @@ class ClusterClient:
 
     def reboot_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Reboots an InnoDB cluster."""
+        if not options:
+            options = {}
+
         command = f"dba.reboot_cluster_from_complete_outage('{cluster_name}', {options})"
 
         try:
@@ -127,7 +139,7 @@ class ClusterClient:
         ))
 
         try:
-            result = self._executor.execute_py(command, timeout=120)
+            result = self._executor.execute_py(command)
         except ExecutionError:
             logger.error("Failed to fetch cluster set status")
             raise
@@ -159,6 +171,9 @@ class ClusterClient:
         options: _Options = None,
     ) -> None:
         """Creates an InnoDB replica cluster into the cluster set."""
+        if not options:
+            options = {}
+
         address = f"{source_host}:{source_port}"
         command = f"\n".join((
             f"shell.connect_to_primary()",
@@ -196,6 +211,9 @@ class ClusterClient:
 
     def remove_cluster_set_replica(self, cluster_name: str, options: _Options = None) -> None:
         """Removes an InnoDB replica cluster from the cluster set."""
+        if not options:
+            options = {}
+
         command = "\n".join((
             f"shell.connect_to_primary()",
             f"cluster_set = dba.get_cluster_set()",
@@ -232,6 +250,9 @@ class ClusterClient:
         options: _Options = None,
     ) -> None:
         """Attached an instance into an InnoDB cluster."""
+        if not options:
+            options = {}
+
         address = f"{instance_host}:{instance_port}"
         command = f"\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
@@ -253,6 +274,9 @@ class ClusterClient:
         options: _Options = None,
     ) -> None:
         """Detaches an instance from an InnoDB cluster."""
+        if not options:
+            options = {}
+
         address = f"{instance_host}:{instance_port}"
         command = f"\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
@@ -294,6 +318,9 @@ class ClusterClient:
         options: _Options = None,
     ) -> None:
         """Rejoins an instance back into its InnoDB cluster."""
+        if not options:
+            options = {}
+
         address = f"{instance_host}:{instance_port}"
         command = f"\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
@@ -309,6 +336,9 @@ class ClusterClient:
 
     def check_instance_before_cluster(self, options: _Options = None) -> dict:
         """Checks for an instance configuration before joining an InnoDB cluster."""
+        if not options:
+            options = {}
+
         command = "\n".join((
             f"result = dba.check_instance_configuration(options={options})",
             f"print(result)",
@@ -328,6 +358,9 @@ class ClusterClient:
 
     def setup_instance_before_cluster(self, options: _Options = None) -> None:
         """Sets up an instance configuration before joining an InnoDB cluster."""
+        if not options:
+            options = {}
+
         command = f"dba.configure_instance(options={options})"
         host = self._executor.connection_details.host
         port = self._executor.connection_details.port
@@ -375,10 +408,11 @@ class ClusterClient:
         options: _Options = None,
     ) -> None:
         """Updates an instance within an InnoDB cluster."""
+        if not options:
+            options = {}
+
         address = f"{instance_host}:{instance_port}"
-        command = [
-            f"cluster = dba.get_cluster('{cluster_name}')",
-        ]
+        command = [f"cluster = dba.get_cluster('{cluster_name}')"]
 
         for key, val in options.items():
             val = f"'{val}'" if isinstance(val, str) else val

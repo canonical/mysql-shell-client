@@ -9,6 +9,7 @@ from mysql_shell.clients import ClusterClient
 from mysql_shell.executors import LocalExecutor
 
 from ..helpers import (
+    TEST_CLUSTER_HOST,
     TEST_CLUSTER_NAME,
     build_local_executor,
 )
@@ -60,6 +61,24 @@ class TestClusterClient:
         """Test the checking of an instance config before joining a cluster."""
         result = client.check_instance_before_cluster()
         assert result["status"] == "ok"
+
+    def test_promote_instance_within_cluster(self, client: ClusterClient):
+        """Test the promotion of an instance within a cluster."""
+        status = client.fetch_cluster_status(TEST_CLUSTER_NAME)
+        primary = status.get("defaultReplicaSet", {}).get("primary", "")
+        assert primary.endswith("3306")
+
+        client.promote_instance_within_cluster(TEST_CLUSTER_NAME, TEST_CLUSTER_HOST, "3307")
+
+        status = client.fetch_cluster_status(TEST_CLUSTER_NAME)
+        primary = status.get("defaultReplicaSet", {}).get("primary", "")
+        assert primary.endswith("3307")
+
+        client.promote_instance_within_cluster(TEST_CLUSTER_NAME, TEST_CLUSTER_HOST, "3306")
+
+        status = client.fetch_cluster_status(TEST_CLUSTER_NAME)
+        primary = status.get("defaultReplicaSet", {}).get("primary", "")
+        assert primary.endswith("3306")
 
     def test_update_instance_within_cluster(self, client: ClusterClient):
         """Test the updating an instance config within a cluster."""
