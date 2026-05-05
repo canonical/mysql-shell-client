@@ -6,7 +6,7 @@ import os
 import pytest
 
 from mysql_shell.builders import StringQueryQuoter
-from mysql_shell.clients import MySQLInstanceClient
+from mysql_shell.clients import InstanceClient
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models.account import Role, User
 from mysql_shell.models.instance import InstanceRole, InstanceState
@@ -21,7 +21,7 @@ from ..helpers import (
 
 @pytest.mark.integration
 class TestInstanceClient:
-    """Class to group all the MySQLInstanceClient tests."""
+    """Class to group all the InstanceClient tests."""
 
     @pytest.fixture(scope="class", autouse=True)
     def executor(self):
@@ -34,10 +34,10 @@ class TestInstanceClient:
     @pytest.fixture(scope="class", autouse=True)
     def client(self, executor: LocalExecutor):
         """MySQL Instance client fixture."""
-        return MySQLInstanceClient(executor, StringQueryQuoter())
+        return InstanceClient(executor, StringQueryQuoter())
 
     @staticmethod
-    def _delete_database(client: MySQLInstanceClient, database: str):
+    def _delete_database(client: InstanceClient, database: str):
         """Get the granted roles for a user."""
         query = "DROP DATABASE IF EXISTS `{database}`"
         query = query.format(
@@ -47,7 +47,7 @@ class TestInstanceClient:
         client._executor.execute_sql(query)
 
     @staticmethod
-    def _delete_user(client: MySQLInstanceClient, user: User):
+    def _delete_user(client: InstanceClient, user: User):
         """Get the granted roles for a user."""
         query = "DROP USER IF EXISTS `{username}`@`{hostname}`"
         query = query.format(
@@ -58,7 +58,7 @@ class TestInstanceClient:
         client._executor.execute_sql(query)
 
     @staticmethod
-    def _delete_role(client: MySQLInstanceClient, role: Role):
+    def _delete_role(client: InstanceClient, role: Role):
         """Get the granted roles for a user."""
         query = "DROP ROLE IF EXISTS `{rolename}`@`{hostname}`"
         query = query.format(
@@ -69,7 +69,7 @@ class TestInstanceClient:
         client._executor.execute_sql(query)
 
     @staticmethod
-    def _get_granted_roles(client: MySQLInstanceClient, entity: User | Role):
+    def _get_granted_roles(client: InstanceClient, entity: User | Role):
         """Get the granted roles for a user."""
         query = (
             "SELECT from_user "
@@ -86,7 +86,7 @@ class TestInstanceClient:
         return users
 
     @staticmethod
-    def _get_processes(client: MySQLInstanceClient, info: str):
+    def _get_processes(client: InstanceClient, info: str):
         """Get the processes by statement."""
         query = (
             "SELECT processlist_id "
@@ -99,11 +99,11 @@ class TestInstanceClient:
         procs = [row["processlist_id"] for row in rows]
         return procs
 
-    def test_check_work_ongoing(self, client: MySQLInstanceClient):
+    def test_check_work_ongoing(self, client: InstanceClient):
         """Test the checking of instance work."""
         assert not client.check_work_ongoing("%")
 
-    def test_create_instance_database(self, client: MySQLInstanceClient):
+    def test_create_instance_database(self, client: InstanceClient):
         """Test the creation of an instance database."""
         database = "instance_database_create"
 
@@ -114,7 +114,7 @@ class TestInstanceClient:
         finally:
             self._delete_database(client, database)
 
-    def test_create_instance_role_without_roles(self, client: MySQLInstanceClient):
+    def test_create_instance_role_without_roles(self, client: InstanceClient):
         """Test the creation of an instance role."""
         role = Role("instance_role_create", "%")
 
@@ -125,7 +125,7 @@ class TestInstanceClient:
         finally:
             self._delete_role(client, role)
 
-    def test_create_instance_role_with_roles(self, client: MySQLInstanceClient):
+    def test_create_instance_role_with_roles(self, client: InstanceClient):
         """Test the creation of an instance role."""
         role = Role("instance_role_create", "%")
 
@@ -141,7 +141,7 @@ class TestInstanceClient:
         finally:
             self._delete_role(client, role)
 
-    def test_create_instance_user_without_roles(self, client: MySQLInstanceClient):
+    def test_create_instance_user_without_roles(self, client: InstanceClient):
         """Test the creation of an instance user."""
         user = User("instance_user_create", "%")
 
@@ -152,7 +152,7 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, user)
 
-    def test_create_instance_user_with_roles(self, client: MySQLInstanceClient):
+    def test_create_instance_user_with_roles(self, client: InstanceClient):
         """Test the creation of an instance user."""
         user = User("instance_user_create", "%")
 
@@ -168,7 +168,7 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, user)
 
-    def test_delete_instance_user(self, client: MySQLInstanceClient):
+    def test_delete_instance_user(self, client: InstanceClient):
         """Test the deletion of an instance user."""
         user = User("instance_user_delete", "%")
 
@@ -181,7 +181,7 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, user)
 
-    def test_delete_instance_users(self, client: MySQLInstanceClient):
+    def test_delete_instance_users(self, client: InstanceClient):
         """Test the deletion of a range of instance users."""
         user_1 = User("instance_user_delete_1", "%")
         user_2 = User("instance_user_delete_2", "%")
@@ -201,7 +201,7 @@ class TestInstanceClient:
             self._delete_user(client, user_1)
             self._delete_user(client, user_2)
 
-    def test_update_instance_user_password(self, client: MySQLInstanceClient):
+    def test_update_instance_user_password(self, client: InstanceClient):
         """Test the updating of an instance user password."""
         instance_user = User("instance_user_update", "%")
 
@@ -214,7 +214,7 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, instance_user)
 
-    def test_update_instance_user_attributes(self, client: MySQLInstanceClient):
+    def test_update_instance_user_attributes(self, client: InstanceClient):
         """Test the updating of an instance user attributes."""
         old_attrs = {"key": "val_1"}
         new_attrs = {"key": "val_2"}
@@ -231,33 +231,33 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, instance_user)
 
-    def test_get_cluster_instance_label(self, client: MySQLInstanceClient):
+    def test_get_cluster_instance_label(self, client: InstanceClient):
         """Test the fetching of the cluster instance label."""
         label = client.get_cluster_instance_label()
         assert label.endswith(":3306")
 
-    def test_get_cluster_instance_labels(self, client: MySQLInstanceClient):
+    def test_get_cluster_instance_labels(self, client: InstanceClient):
         """Test the fetching of all the cluster instance labels."""
         labels = client.get_cluster_instance_labels(TEST_CLUSTER_NAME)
         assert len(labels) == 3
 
-    def test_get_cluster_labels(self, client: MySQLInstanceClient):
+    def test_get_cluster_labels(self, client: InstanceClient):
         """Test the fetching of all the cluster labels."""
         assert TEST_CLUSTER_NAME in client.get_cluster_labels()
 
-    def test_get_instance_replication_state(self, client: MySQLInstanceClient):
+    def test_get_instance_replication_state(self, client: InstanceClient):
         """Test the fetching of the instance replication state."""
         assert client.get_instance_replication_state() == InstanceState.ONLINE
 
-    def test_get_instance_replication_role(self, client: MySQLInstanceClient):
+    def test_get_instance_replication_role(self, client: InstanceClient):
         """Test the fetching of the instance replication role."""
         assert client.get_instance_replication_role() == InstanceRole.PRIMARY
 
-    def test_get_instance_variable(self, client: MySQLInstanceClient):
+    def test_get_instance_variable(self, client: InstanceClient):
         """Test the fetching of an instance variable."""
         assert client.get_instance_variable(VariableScope.GLOBAL, "super_read_only") == 0
 
-    def test_set_instance_variable(self, client: MySQLInstanceClient):
+    def test_set_instance_variable(self, client: InstanceClient):
         """Test the fetching of an instance variable."""
         var_name = "max_connections"
         var_value = 100
@@ -271,7 +271,7 @@ class TestInstanceClient:
         client.set_instance_variable(VariableScope.GLOBAL, var_name, var_value)
         assert client.get_instance_variable(VariableScope.GLOBAL, var_name) == var_value
 
-    def test_install_plugin(self, client: MySQLInstanceClient):
+    def test_install_plugin(self, client: InstanceClient):
         """Test the installation of an instance plugin."""
         plugins = client.search_instance_plugins("%")
         assert "auth_socket" not in plugins
@@ -284,7 +284,7 @@ class TestInstanceClient:
         finally:
             client.uninstall_instance_plugin("auth_socket")
 
-    def test_install_component(self, client: MySQLInstanceClient):
+    def test_install_component(self, client: InstanceClient):
         """Test the installation of a component."""
         components = client.search_instance_components("%")
         assert "file://component_validate_password" not in components
@@ -297,11 +297,11 @@ class TestInstanceClient:
         finally:
             client.uninstall_instance_component("file://component_validate_password")
 
-    def test_reload_instance_certs(self, client: MySQLInstanceClient):
+    def test_reload_instance_certs(self, client: InstanceClient):
         """Test the reloading of instance TLS certificates."""
         pass
 
-    def test_search_instance_replication_members(self, client: MySQLInstanceClient):
+    def test_search_instance_replication_members(self, client: InstanceClient):
         """Test the searching of instance replication members."""
         members = client.search_instance_replication_members()
         assert len(members) == 3
@@ -322,7 +322,7 @@ class TestInstanceClient:
                 states=[InstanceState.ONLINE],
             )
 
-    def test_search_instance_connections(self, client: MySQLInstanceClient):
+    def test_search_instance_connections(self, client: InstanceClient):
         """Test the searching of instance connections given a name-pattern."""
         query = "DO SLEEP(10)"
 
@@ -333,7 +333,7 @@ class TestInstanceClient:
             assert process_ids[0] in client.search_instance_connection_processes("%")
             assert process_ids[0] not in client.search_instance_connection_processes("search")
 
-    def test_search_instance_databases(self, client: MySQLInstanceClient):
+    def test_search_instance_databases(self, client: InstanceClient):
         """Test the searching of instance databases given a name-pattern."""
         dbs = client.search_instance_databases("%")
         assert "mysql" in dbs
@@ -343,18 +343,18 @@ class TestInstanceClient:
         dbs = client.search_instance_databases("database_search")
         assert not dbs
 
-    def test_search_instance_plugins(self, client: MySQLInstanceClient):
+    def test_search_instance_plugins(self, client: InstanceClient):
         """Test the searching of instance plugins given a name-pattern."""
         plugins = client.search_instance_plugins("%")
         assert "clone" in plugins
         assert "group_replication" in plugins
 
-    def test_search_instance_components(self, client: MySQLInstanceClient):
+    def test_search_instance_components(self, client: InstanceClient):
         """Test the searching of instance components given a URN pattern."""
         components = client.search_instance_components("%")
         assert not components
 
-    def test_search_instance_roles(self, client: MySQLInstanceClient):
+    def test_search_instance_roles(self, client: InstanceClient):
         """Test the searching of instance roles given a name-pattern."""
         role = Role("instance_role_search", "%")
 
@@ -366,7 +366,7 @@ class TestInstanceClient:
         finally:
             self._delete_role(client, role)
 
-    def test_search_instance_users_without_attrs(self, client: MySQLInstanceClient):
+    def test_search_instance_users_without_attrs(self, client: InstanceClient):
         """Test the searching of instance users given a name-pattern."""
         user = User("instance_user_search", "%", {})
 
@@ -378,7 +378,7 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, user)
 
-    def test_search_instance_users_with_attrs(self, client: MySQLInstanceClient):
+    def test_search_instance_users_with_attrs(self, client: InstanceClient):
         """Test the searching of instance users given a name-pattern and attributes."""
         user = User("instance_user_search", "%", {"key": "val"})
 
@@ -390,15 +390,15 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, user)
 
-    def test_start_instance_replication(self, client: MySQLInstanceClient):
+    def test_start_instance_replication(self, client: InstanceClient):
         """Test the starting of group replication."""
         pass
 
-    def test_stop_instance_replication(self, client: MySQLInstanceClient):
+    def test_stop_instance_replication(self, client: InstanceClient):
         """Test the stopping of group replication."""
         pass
 
-    def test_stop_instance_processes(self, client: MySQLInstanceClient):
+    def test_stop_instance_processes(self, client: InstanceClient):
         """Test the stopping of processes."""
         client.stop_instance_processes([])
 

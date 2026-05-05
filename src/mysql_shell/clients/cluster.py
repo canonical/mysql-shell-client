@@ -13,7 +13,7 @@ logger = logging.getLogger()
 _Options = Mapping[str, str] | None
 
 
-class MySQLClusterClient:
+class ClusterClient:
     """Class to encapsulate all cluster operations using MySQL Shell."""
 
     def __init__(self, executor: BaseExecutor):

@@ -17,7 +17,7 @@ logger = logging.getLogger()
 _Attrs = Mapping[str, str] | None
 
 
-class MySQLInstanceClient:
+class InstanceClient:
     """Class to encapsulate all instance operations using MySQL Shell."""
 
     def __init__(self, executor: BaseExecutor, quoter: StringQueryQuoter):
