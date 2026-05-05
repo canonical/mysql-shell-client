@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from mysql_shell.builders import StringQueryQuoter
+from mysql_shell.builders import QueryQuoter
 from mysql_shell.clients import InstanceClient
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models.account import Role, User
@@ -34,7 +34,7 @@ class TestInstanceClient:
     @pytest.fixture(scope="class", autouse=True)
     def client(self, executor: LocalExecutor):
         """MySQL Instance client fixture."""
-        return InstanceClient(executor, StringQueryQuoter())
+        return InstanceClient(executor, QueryQuoter())
 
     @staticmethod
     def _delete_database(client: InstanceClient, database: str):

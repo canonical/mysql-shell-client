@@ -53,10 +53,10 @@ in addition to a set of predefined queries to cover most of the common use-cases
 
 5. Import and build the clients:
    ```python
-   from mysql_shell.builders.quoting import StringQueryQuoter
+   from mysql_shell.builders.quoting import QueryQuoter
    from mysql_shell.clients import ClusterClient, InstanceClient
 
-   quoter = StringQueryQuoter()
+   quoter = QueryQuoter()
 
    cluster_client = ClusterClient(cluster_executor, quoter)
    instance_client = InstanceClient(instance_executor, quoter)

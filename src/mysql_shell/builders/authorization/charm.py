@@ -1,7 +1,7 @@
 # Copyright 2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-from ..quoting import StringQueryQuoter
+from ..quoting import QueryQuoter
 from .base import BaseAuthorizationQueryBuilder
 
 
@@ -43,7 +43,7 @@ class CharmAuthorizationQueryBuilder(BaseAuthorizationQueryBuilder):
         role_writer: str,
     ):
         """Initialize the query builder."""
-        self._quoter = StringQueryQuoter()
+        self._quoter = QueryQuoter()
         self._role_admin = self._quoter.quote_identifier(role_admin)
         self._role_backup = self._quoter.quote_identifier(role_backup)
         self._role_ddl = self._quoter.quote_identifier(role_ddl)

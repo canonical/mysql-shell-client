@@ -1,7 +1,7 @@
 # Copyright 2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-from ..quoting import StringQueryQuoter
+from ..quoting import QueryQuoter
 from .base import BaseLockingQueryBuilder
 
 
@@ -18,7 +18,7 @@ class CharmLockingQueryBuilder(BaseLockingQueryBuilder):
 
     def __init__(self, table_schema: str, table_name: str):
         """Initialize the query builder."""
-        self._quoter = StringQueryQuoter()
+        self._quoter = QueryQuoter()
         self._table = "{table_schema}.{table_name}".format(
             table_schema=self._quoter.quote_identifier(table_schema),
             table_name=self._quoter.quote_identifier(table_name),

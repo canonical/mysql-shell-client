@@ -4,7 +4,7 @@
 from typing import Sequence
 
 from ...models import LogType
-from ..quoting import StringQueryQuoter
+from ..quoting import QueryQuoter
 from .base import BaseLoggingQueryBuilder
 
 
@@ -13,7 +13,7 @@ class CharmLoggingQueryBuilder(BaseLoggingQueryBuilder):
 
     def __init__(self):
         """Initialize the query builder."""
-        self._quoter = StringQueryQuoter()
+        self._quoter = QueryQuoter()
 
     def build_logs_flushing_query(self, logs: Sequence[LogType] | None = None) -> str:
         """Builds the logs flushing query.

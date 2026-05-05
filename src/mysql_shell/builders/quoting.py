@@ -5,7 +5,7 @@ from functools import cache
 from typing import Any
 
 
-class StringQueryQuoter:
+class QueryQuoter:
     """Class to escape and quote MySQL query input parameters."""
 
     @staticmethod
