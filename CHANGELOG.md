@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+
+## [1.0.0][changes-1.0.0] - 2026-05-26
 ### Added
 - Timeout argument to BaseExecutor classes.
 - Namespace package `mysql_shell_contrib`.
@@ -122,5 +124,6 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 [changes-0.8.0]: https://github.com/canonical/mysql-shell-client/compare/0.7.1...0.8.0
 [changes-0.8.1]: https://github.com/canonical/mysql-shell-client/compare/0.8.0...0.8.1
 [changes-0.9.0]: https://github.com/canonical/mysql-shell-client/compare/0.8.1...0.9.0
+[changes-1.0.0]: https://github.com/canonical/mysql-shell-client/compare/0.9.0...1.0.0
 [docs-changelog]: https://keepachangelog.com/en/1.0.0/
 [docs-semver]: https://semver.org/spec/v2.0.0.html
