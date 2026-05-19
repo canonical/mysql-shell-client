@@ -18,6 +18,16 @@ maintainers = [
 dependencies = []
 
 [project.optional-dependencies]
+contrib = [
+    "ops~=3.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/canonical/mysql-shell-client"
+Issues = "https://github.com/canonical/mysql-shell-client/issues"
+Changelog = "https://github.com/canonical/mysql-shell-client/blob/main/CHANGELOG.md"
+
+[dependency-groups]
 format = [
     "ruff~=0.15",
 ]
@@ -29,12 +39,6 @@ test = [
     "coverage~=7.13",
     "pytest~=9.0",
 ]
-
-[project.urls]
-Homepage = "https://github.com/canonical/mysql-shell-client"
-Issues = "https://github.com/canonical/mysql-shell-client/issues"
-Changelog = "https://github.com/canonical/mysql-shell-client/blob/main/CHANGELOG.md"
-
 
 # Testing tools configuration
 [tool.coverage.run]
@@ -53,6 +57,7 @@ requires-poetry = ">=2.0.0"
 package-mode = true
 packages = [
     { include = "mysql_shell", from = "src" },
+    { include = "mysql_shell_contrib", from = "src" },
 ]
 
 # Linting tools configuration
