@@ -5,9 +5,9 @@ import os
 
 import pytest
 
-from mysql_shell.builders import CharmLoggingQueryBuilder
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models import LogType
+from mysql_shell_contrib.builders import CharmLoggingQueryBuilder
 
 from ...helpers import build_local_executor
 
