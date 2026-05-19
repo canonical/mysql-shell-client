@@ -5,10 +5,9 @@ import os
 
 import pytest
 
-from mysql_shell.builders import CharmLockingQueryBuilder
+from helpers import build_local_executor
 from mysql_shell.executors import LocalExecutor
-
-from ...helpers import build_local_executor
+from mysql_shell_contrib.builders import CharmLockingQueryBuilder
 
 
 @pytest.mark.integration

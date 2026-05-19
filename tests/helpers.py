@@ -52,8 +52,8 @@ def temp_process(query: str):
 def temp_variable(scope: VariableScope, name: str, new_value: Any):
     """Context manager to run a piece of code with a variable changed."""
     executor = build_local_executor(
-        username=os.environ.get("MYSQL_USERNAME"),
-        password=os.environ.get("MYSQL_PASSWORD"),
+        username=os.environ.get("MYSQL_USERNAME", ""),
+        password=os.environ.get("MYSQL_PASSWORD", ""),
     )
 
     set_query = "SET @@{scope}.{name} = {value}"

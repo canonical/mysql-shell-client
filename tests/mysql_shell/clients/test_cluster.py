@@ -5,14 +5,13 @@ import os
 
 import pytest
 
-from mysql_shell.clients import ClusterClient
-from mysql_shell.executors import LocalExecutor
-
-from ..helpers import (
+from helpers import (
     TEST_CLUSTER_HOST,
     TEST_CLUSTER_NAME,
     build_local_executor,
 )
+from mysql_shell.clients import ClusterClient
+from mysql_shell.executors import LocalExecutor
 
 
 @pytest.mark.integration

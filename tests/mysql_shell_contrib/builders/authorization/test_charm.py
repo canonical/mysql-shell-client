@@ -5,16 +5,12 @@ import os
 
 import pytest
 
-from mysql_shell.builders import CharmAuthorizationQueryBuilder
+from helpers import build_local_executor, temp_variable
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.executors.errors import ExecutionError
 from mysql_shell.models.account import Role
 from mysql_shell.models.statement import VariableScope
-
-from ...helpers import (
-    build_local_executor,
-    temp_variable,
-)
+from mysql_shell_contrib.builders import CharmAuthorizationQueryBuilder
 
 
 @pytest.mark.integration

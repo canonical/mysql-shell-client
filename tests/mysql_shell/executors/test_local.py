@@ -6,10 +6,9 @@ import os
 
 import pytest
 
+from helpers import build_local_executor
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.executors.errors import ExecutionError
-
-from ..helpers import build_local_executor
 
 
 @pytest.mark.integration
