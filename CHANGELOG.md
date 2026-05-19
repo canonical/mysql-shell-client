@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 ## Unreleased
 ### Added
 - Timeout argument to BaseExecutor classes.
-
+- Namespace package `mysql_shell_contrib`.
 ### Fixed
 - Rename quoter and client classes.
 - Reduce logging level when failing to get cluster labels.
