@@ -18,6 +18,16 @@ maintainers = [
 dependencies = []
 
 [project.optional-dependencies]
+contrib = [
+    "ops>=2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/canonical/mysql-shell-client"
+Issues = "https://github.com/canonical/mysql-shell-client/issues"
+Changelog = "https://github.com/canonical/mysql-shell-client/blob/main/CHANGELOG.md"
+
+[dependency-groups]
 format = [
     "ruff~=0.15",
 ]
@@ -30,12 +40,6 @@ test = [
     "pytest~=9.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/canonical/mysql-shell-client"
-Issues = "https://github.com/canonical/mysql-shell-client/issues"
-Changelog = "https://github.com/canonical/mysql-shell-client/blob/main/CHANGELOG.md"
-
-
 # Testing tools configuration
 [tool.coverage.run]
 branch = true
@@ -44,8 +48,9 @@ branch = true
 show_missing = true
 
 [tool.pytest.ini_options]
-log_cli_level = "INFO"
+addopts = ["--import-mode=importlib"]
 markers = ["unit", "integration"]
+pythonpath = ["src", "tests"]
 
 # Dependency tools configuration
 [tool.poetry]
@@ -53,6 +58,7 @@ requires-poetry = ">=2.0.0"
 package-mode = true
 packages = [
     { include = "mysql_shell", from = "src" },
+    { include = "mysql_shell_contrib", from = "src" },
 ]
 
 # Linting tools configuration
