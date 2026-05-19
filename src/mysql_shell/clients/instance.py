@@ -57,7 +57,7 @@ class InstanceClient:
             logger.error(f"Failed to create instance database {database}")
             raise
 
-    def create_instance_role(self, role: Role, roles: list[str] = None) -> None:
+    def create_instance_role(self, role: Role, roles: list[str] | None = None) -> None:
         """Creates a new instance role."""
         if not roles:
             granting_query = ""
@@ -86,7 +86,9 @@ class InstanceClient:
             logger.error(f"Failed to create instance role {role.rolename}.{role.hostname}")
             raise
 
-    def create_instance_user(self, user: User, password: str, roles: list[str] = None) -> None:
+    def create_instance_user(
+        self, user: User, password: str, roles: list[str] | None = None
+    ) -> None:
         """Creates an instance user with the provided attributes."""
         if not roles:
             granting_query = ""
@@ -154,7 +156,9 @@ class InstanceClient:
             logger.error("Failed to delete instance users")
             raise
 
-    def update_instance_user(self, user: User, password: str = None, attrs: _Attrs = None) -> None:
+    def update_instance_user(
+        self, user: User, password: str | None = None, attrs: _Attrs = None
+    ) -> None:
         """Updates an instance user with the provided password and / or attributes."""
         if not password and not attrs:
             raise ValueError("Either password or attrs must be provided")
