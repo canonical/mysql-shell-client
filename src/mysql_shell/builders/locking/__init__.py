@@ -2,4 +2,3 @@
 # See LICENSE file for licensing details.
 
 from .base import BaseLockingQueryBuilder
-from .charm import CharmLockingQueryBuilder
