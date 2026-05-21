@@ -15,7 +15,7 @@ from ..models.statement import VariableScope
 logger = logging.getLogger()
 
 _Attrs = Mapping[str, str] | None
-_Roles = list[str] | None
+_Roles = Sequence[str] | None
 
 
 class InstanceClient:
