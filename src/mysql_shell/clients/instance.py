@@ -15,6 +15,7 @@ from ..models.statement import VariableScope
 logger = logging.getLogger()
 
 _Attrs = Mapping[str, str] | None
+_Roles = list[str] | None
 
 
 class InstanceClient:
@@ -57,7 +58,7 @@ class InstanceClient:
             logger.error(f"Failed to create instance database {database}")
             raise
 
-    def create_instance_role(self, role: Role, roles: list[str] | None = None) -> None:
+    def create_instance_role(self, role: Role, roles: _Roles = None) -> None:
         """Creates a new instance role."""
         if not roles:
             granting_query = ""
@@ -86,9 +87,7 @@ class InstanceClient:
             logger.error(f"Failed to create instance role {role.rolename}.{role.hostname}")
             raise
 
-    def create_instance_user(
-        self, user: User, password: str, roles: list[str] | None = None
-    ) -> None:
+    def create_instance_user(self, user: User, password: str, roles: _Roles = None) -> None:
         """Creates an instance user with the provided attributes."""
         if not roles:
             granting_query = ""
