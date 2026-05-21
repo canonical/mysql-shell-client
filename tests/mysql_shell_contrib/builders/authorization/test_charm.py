@@ -11,12 +11,6 @@ from mysql_shell.models.account import Role
 from mysql_shell.models.statement import VariableScope
 from mysql_shell_contrib.builders import CharmAuthorizationQueryBuilder
 
-from ...helpers import (
-    build_local_executor,
-    temp_variable,
-)
-
-
 @pytest.mark.integration
 class TestCharmAuthorizationQueryBuilder:
     """Class to group all the CharmAuthorizationQueryBuilder tests."""
@@ -27,7 +21,7 @@ class TestCharmAuthorizationQueryBuilder:
     TABLE_SELECT_QUERY = "SELECT name FROM test.roles"
 
     @pytest.fixture(scope="class", autouse=True)
-    def executor(self):
+    def executor(self, build_local_executor):
         """Local executor fixture."""
         return build_local_executor(
             username=os.environ["MYSQL_USERNAME"],
@@ -35,7 +29,7 @@ class TestCharmAuthorizationQueryBuilder:
         )
 
     @pytest.fixture(scope="class", autouse=True)
-    def config(self):
+    def config(self, temp_variable):
         """Database config fixture."""
         with temp_variable(VariableScope.GLOBAL, "activate_all_roles_on_login", "ON"):
             yield
@@ -51,7 +45,7 @@ class TestCharmAuthorizationQueryBuilder:
 
         executor.execute_sql(query)
 
-    def test_instance_auth_roles_query(self, executor: LocalExecutor):
+    def test_instance_auth_roles_query(self, executor: LocalExecutor, build_local_executor):
         """Test the creation of instance auth roles."""
         builder = CharmAuthorizationQueryBuilder(
             role_admin="role_admin",
@@ -169,7 +163,7 @@ class TestCharmAuthorizationQueryBuilder:
         finally:
             self._delete_role(executor, Role("role_writer"))
 
-    def test_database_admin_role_query(self, executor: LocalExecutor):
+    def test_database_admin_role_query(self, executor: LocalExecutor, build_local_executor):
         """Test the creation of a database admin role."""
         builder = CharmAuthorizationQueryBuilder(
             role_admin="role_admin",

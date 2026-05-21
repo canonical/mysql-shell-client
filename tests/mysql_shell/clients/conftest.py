@@ -2,26 +2,18 @@
 # See LICENSE file for licensing details.
 
 import os
-from contextlib import suppress
+import threading
+import time
+from contextlib import contextmanager, suppress
 
 import pytest
 
-from ..helpers import (
-    TEST_CLUSTER_HOST,
-    TEST_CLUSTER_NAME,
-    TEST_CLUSTER_PORT,
-    build_local_executor,
-)
-
-_GTID_MODES_ORDERED = (
-    "OFF",
-    "OFF_PERMISSIVE",
-    "ON_PERMISSIVE",
-    "ON",
-)
+TEST_CLUSTER_NAME = "test-cluster"
+TEST_CLUSTER_HOST = "0.0.0.0"
+TEST_CLUSTER_PORT = "3306"
 
 
-def _create_cluster() -> None:
+def _create_cluster(build_local_executor) -> None:
     """Creates InnoDB cluster."""
     executor = build_local_executor(
         username=os.environ["MYSQL_USERNAME"],
@@ -34,8 +26,8 @@ def _create_cluster() -> None:
         executor.execute_py(f"dba.create_cluster('{TEST_CLUSTER_NAME}')")
 
 
-def _config_instance(instance_address: str, instance_port: str) -> None:
-    """Configs as instance before joining a InnoDB cluster."""
+def _config_instance(build_local_executor, instance_address: str, instance_port: str) -> None:
+    """Configs an instance before joining an InnoDB cluster."""
     executor = build_local_executor(
         username=os.environ["MYSQL_USERNAME"],
         password=os.environ["MYSQL_PASSWORD"],
@@ -45,6 +37,13 @@ def _config_instance(instance_address: str, instance_port: str) -> None:
 
     executor.execute_sql("SET @@GLOBAL.enforce_gtid_consistency = 'ON'")
 
+    _GTID_MODES_ORDERED = (
+        "OFF",
+        "OFF_PERMISSIVE",
+        "ON_PERMISSIVE",
+        "ON",
+    )
+
     gtid_mode = executor.execute_sql("SELECT @@GLOBAL.gtid_mode AS gtid_mode")
     gtid_mode = gtid_mode[0]["gtid_mode"]
     gtid_mode_index = _GTID_MODES_ORDERED.index(gtid_mode)
@@ -53,7 +52,7 @@ def _config_instance(instance_address: str, instance_port: str) -> None:
         executor.execute_sql(f"SET @@GLOBAL.gtid_mode = '{mode}'")
 
 
-def _join_instance(instance_address: str, instance_port: str) -> None:
+def _join_instance(build_local_executor, instance_address: str, instance_port: str) -> None:
     """Joins an instance to the testing InnoDB cluster."""
     executor = build_local_executor(
         username=os.environ["MYSQL_USERNAME"],
@@ -62,24 +61,48 @@ def _join_instance(instance_address: str, instance_port: str) -> None:
         port=TEST_CLUSTER_PORT,
     )
 
-    executor.execute_py(
-        "\n".join((
-            f"cluster = dba.get_cluster('{TEST_CLUSTER_NAME}')",
-            f"cluster.add_instance("
-            f"  instance='{instance_address}:{instance_port}',"
-            f"  options={{'recoveryMethod': 'incremental'}},"
-            f")",
-        )),
-    )
+    with suppress(Exception):
+        executor.execute_py(
+            "\n".join((
+                f"cluster = dba.get_cluster('{TEST_CLUSTER_NAME}')",
+                f"cluster.add_instance("
+                f"  instance='{instance_address}:{instance_port}',"
+                f"  options={{'recoveryMethod': 'incremental'}},"
+                f")",
+            )),
+        )
 
 
 @pytest.fixture(scope="session", autouse=True)
-def initialize_cluster():
+def initialize_cluster(build_local_executor):
     """Initializes InnoDB cluster in an idempotent way."""
-    _config_instance(instance_address=TEST_CLUSTER_HOST, instance_port="3306")
-    _config_instance(instance_address=TEST_CLUSTER_HOST, instance_port="3307")
-    _config_instance(instance_address=TEST_CLUSTER_HOST, instance_port="3308")
+    _config_instance(build_local_executor, instance_address=TEST_CLUSTER_HOST, instance_port="3306")
+    _config_instance(build_local_executor, instance_address=TEST_CLUSTER_HOST, instance_port="3307")
+    _config_instance(build_local_executor, instance_address=TEST_CLUSTER_HOST, instance_port="3308")
 
-    _create_cluster()
-    _join_instance(instance_address=TEST_CLUSTER_HOST, instance_port="3307")
-    _join_instance(instance_address=TEST_CLUSTER_HOST, instance_port="3308")
+    _create_cluster(build_local_executor)
+    _join_instance(build_local_executor, instance_address=TEST_CLUSTER_HOST, instance_port="3307")
+    _join_instance(build_local_executor, instance_address=TEST_CLUSTER_HOST, instance_port="3308")
+
+
+@pytest.fixture(scope="session")
+def temp_process(build_local_executor):
+    """Factory fixture returning a context manager that runs a SQL query in a background thread."""
+
+    @contextmanager
+    def _temp_process(query: str):
+        executor = build_local_executor(
+            username=os.environ["MYSQL_USERNAME"],
+            password=os.environ["MYSQL_PASSWORD"],
+        )
+
+        thread = threading.Thread(target=executor.execute_sql, args=[query])
+
+        try:
+            thread.start()
+            time.sleep(1)
+            yield
+        finally:
+            thread.join()
+
+    return _temp_process

@@ -8,11 +8,8 @@ import pytest
 from mysql_shell.clients import ClusterClient
 from mysql_shell.executors import LocalExecutor
 
-from ..helpers import (
-    TEST_CLUSTER_HOST,
-    TEST_CLUSTER_NAME,
-    build_local_executor,
-)
+TEST_CLUSTER_NAME = "test-cluster"
+TEST_CLUSTER_HOST = "0.0.0.0"
 
 
 @pytest.mark.integration
@@ -20,7 +17,7 @@ class TestClusterClient:
     """Class to group all the ClusterClient tests."""
 
     @pytest.fixture(scope="class", autouse=True)
-    def executor(self):
+    def executor(self, build_local_executor):
         """Local executor fixture."""
         return build_local_executor(
             username=os.environ["MYSQL_USERNAME"],

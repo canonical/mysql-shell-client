@@ -50,6 +50,7 @@ show_missing = true
 [tool.pytest.ini_options]
 log_cli_level = "INFO"
 markers = ["unit", "integration"]
+addopts = "--import-mode=importlib"
 
 # Dependency tools configuration
 [tool.poetry]

@@ -12,11 +12,7 @@ from mysql_shell.models.account import Role, User
 from mysql_shell.models.instance import InstanceRole, InstanceState
 from mysql_shell.models.statement import VariableScope
 
-from ..helpers import (
-    TEST_CLUSTER_NAME,
-    build_local_executor,
-    temp_process,
-)
+TEST_CLUSTER_NAME = "test-cluster"
 
 
 @pytest.mark.integration
@@ -24,7 +20,7 @@ class TestInstanceClient:
     """Class to group all the InstanceClient tests."""
 
     @pytest.fixture(scope="class", autouse=True)
-    def executor(self):
+    def executor(self, build_local_executor):
         """Local executor fixture."""
         return build_local_executor(
             username=os.environ["MYSQL_USERNAME"],
@@ -201,7 +197,7 @@ class TestInstanceClient:
             self._delete_user(client, user_1)
             self._delete_user(client, user_2)
 
-    def test_update_instance_user_password(self, client: InstanceClient):
+    def test_update_instance_user_password(self, client: InstanceClient, build_local_executor):
         """Test the updating of an instance user password."""
         instance_user = User("instance_user_update", "%")
 
@@ -322,7 +318,7 @@ class TestInstanceClient:
                 states=[InstanceState.ONLINE],
             )
 
-    def test_search_instance_connections(self, client: InstanceClient):
+    def test_search_instance_connections(self, client: InstanceClient, temp_process):
         """Test the searching of instance connections given a name-pattern."""
         query = "DO SLEEP(10)"
 
@@ -398,7 +394,7 @@ class TestInstanceClient:
         """Test the stopping of group replication."""
         pass
 
-    def test_stop_instance_processes(self, client: InstanceClient):
+    def test_stop_instance_processes(self, client: InstanceClient, temp_process):
         """Test the stopping of processes."""
         client.stop_instance_processes([])
 

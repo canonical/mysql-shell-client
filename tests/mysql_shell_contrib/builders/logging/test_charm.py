@@ -9,15 +9,12 @@ from mysql_shell.executors import LocalExecutor
 from mysql_shell.models import LogType
 from mysql_shell_contrib.builders import CharmLoggingQueryBuilder
 
-from ...helpers import build_local_executor
-
-
 @pytest.mark.integration
 class TestCharmLoggingQueryBuilder:
     """Class to group all the CharmLoggingQueryBuilder tests."""
 
     @pytest.fixture(scope="class")
-    def executor(self):
+    def executor(self, build_local_executor):
         """Local executor fixture."""
         return build_local_executor(
             username=os.environ["MYSQL_USERNAME"],

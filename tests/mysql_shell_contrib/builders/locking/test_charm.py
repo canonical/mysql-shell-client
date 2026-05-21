@@ -8,15 +8,12 @@ import pytest
 from mysql_shell.executors import LocalExecutor
 from mysql_shell_contrib.builders import CharmLockingQueryBuilder
 
-from ...helpers import build_local_executor
-
-
 @pytest.mark.integration
 class TestCharmLockingQueryBuilder:
     """Class to group all the CharmLockingQueryBuilder tests."""
 
     @pytest.fixture(scope="class")
-    def executor(self):
+    def executor(self, build_local_executor):
         """Local executor fixture."""
         return build_local_executor(
             username=os.environ["MYSQL_USERNAME"],

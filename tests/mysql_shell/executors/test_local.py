@@ -9,15 +9,12 @@ import pytest
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.executors.errors import ExecutionError
 
-from ..helpers import build_local_executor
-
-
 @pytest.mark.integration
 class TestLocalExecutor:
     """Class to group all the LocalExecutor tests."""
 
     @pytest.fixture(scope="class")
-    def executor(self):
+    def executor(self, build_local_executor):
         """Local executor fixture."""
         return build_local_executor(
             username=os.environ["MYSQL_USERNAME"],
@@ -28,7 +25,7 @@ class TestLocalExecutor:
         """Check the connection."""
         executor.check_connection()
 
-    def test_check_connection_error(self, executor: LocalExecutor):
+    def test_check_connection_error(self, executor: LocalExecutor, build_local_executor):
         """Check the connection when there is an error."""
         executor = build_local_executor(
             username="wrong_username",
@@ -51,7 +48,7 @@ class TestLocalExecutor:
         result = json.loads(result)
         assert isinstance(result, dict)
 
-    def test_execute_py_error(self, executor: LocalExecutor):
+    def test_execute_py_error(self, executor: LocalExecutor, build_local_executor):
         """Test the execution of Python scripts when there is an error."""
         try:
             executor.execute_py("syntax")
@@ -78,7 +75,7 @@ class TestLocalExecutor:
         assert isinstance(rows, list)
         assert any(row["user"] == "root" for row in rows)
 
-    def test_execute_sql_error(self, executor: LocalExecutor):
+    def test_execute_sql_error(self, executor: LocalExecutor, build_local_executor):
         """Test the execution of SQL scripts when there is an error."""
         try:
             executor.execute_sql("SELECT")
