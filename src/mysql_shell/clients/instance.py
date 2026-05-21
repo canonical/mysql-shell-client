@@ -155,9 +155,7 @@ class InstanceClient:
             logger.error("Failed to delete instance users")
             raise
 
-    def update_instance_user(
-        self, user: User, password: str | None = None, attrs: _Attrs = None
-    ) -> None:
+    def update_instance_user(self, user: User, password: str = "", attrs: _Attrs = None) -> None:
         """Updates an instance user with the provided password and / or attributes."""
         if not password and not attrs:
             raise ValueError("Either password or attrs must be provided")
