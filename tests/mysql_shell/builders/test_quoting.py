@@ -3,7 +3,19 @@
 
 import pytest
 
-from mysql_shell.builders import QueryQuoter
+from mysql_shell.builders import ArgsQuoter, QueryQuoter
+
+
+@pytest.mark.unit
+class TestArgsQuoter:
+    """Class to group all the ArgsQuoter tests."""
+
+    def test_quote_value(self):
+        """Test the quote_value method."""
+        quoter = ArgsQuoter()
+
+        assert quoter.quote_value("test") == "'test'"
+        assert quoter.quote_value(100) == 100
 
 
 @pytest.mark.unit
