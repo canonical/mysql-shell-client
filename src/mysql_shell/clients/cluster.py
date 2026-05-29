@@ -5,6 +5,7 @@ import json
 import logging
 from typing import Mapping
 
+from ..builders import ArgsQuoter
 from ..executors import BaseExecutor
 from ..executors.errors import ExecutionError
 
@@ -16,9 +17,10 @@ _Options = Mapping[str, str] | None
 class ClusterClient:
     """Class to encapsulate all cluster operations using MySQL Shell."""
 
-    def __init__(self, executor: BaseExecutor):
+    def __init__(self, executor: BaseExecutor, quoter: ArgsQuoter):
         """Initialize the class."""
         self._executor = executor
+        self._quoter = quoter
 
     def create_cluster(self, cluster_name: str, options: _Options = None) -> None:
         """Creates an InnoDB cluster."""
@@ -415,9 +417,9 @@ class ClusterClient:
         command = [f"cluster = dba.get_cluster('{cluster_name}')"]
 
         for key, val in options.items():
-            val = f"'{val}'" if isinstance(val, str) else val
-            cmd = f"cluster.set_instance_option('{address}', '{key}', {val})"
-            command.append(cmd)
+            quoted_key = self._quoter.quote_value(key)
+            quoted_val = self._quoter.quote_value(val)
+            command.append(f"cluster.set_instance_option('{address}', {quoted_key}, {quoted_val})")
 
         command = "\n".join(command)
 
@@ -435,14 +437,43 @@ class ClusterClient:
         router_mode: str,
     ) -> None:
         """Removes a router from an InnoDB cluster."""
+        router = f"{router_name}::{router_mode}"
         command = "\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
-            f"cluster.remove_router_metadata('{router_name}::{router_mode}')",
+            f"cluster.remove_router_metadata('{router}')",
         ))
 
         try:
-            logger.debug(f"Removing router from cluster {cluster_name}")
+            logger.debug(f"Removing router {router} from cluster {cluster_name}")
             self._executor.execute_py(command)
         except ExecutionError:
-            logger.error(f"Failed to remove router from cluster {cluster_name}")
+            logger.error(f"Failed to remove router {router} from cluster {cluster_name}")
+            raise
+
+    def update_router_within_cluster(
+        self,
+        cluster_name: str,
+        router_name: str,
+        router_mode: str,
+        options: _Options = None,
+    ) -> None:
+        """Updates a router from an InnoDB cluster. This feature is MySQL 8.4+ exclusive."""
+        if not options:
+            options = {}
+
+        router = f"{router_name}::{router_mode}"
+        command = [f"cluster = dba.get_cluster('{cluster_name}')"]
+
+        for key, val in options.items():
+            quoted_key = self._quoter.quote_value(key)
+            quoted_val = self._quoter.quote_value(val)
+            command.append(f"cluster.set_routing_option('{router}', {quoted_key}, {quoted_val})")
+
+        command = "\n".join(command)
+
+        try:
+            logger.debug(f"Updating router {router} from cluster {cluster_name}")
+            self._executor.execute_py(command)
+        except ExecutionError:
+            logger.error(f"Failed to update router {router} from cluster {cluster_name}")
             raise
