@@ -43,13 +43,14 @@ in addition to a set of predefined queries to cover most of the common use-cases
 
 4. Import and build the clients:
    ```python
-   from mysql_shell.builders.quoting import QueryQuoter
+   from mysql_shell.builders.quoting import ArgsQuoter, QueryQuoter
    from mysql_shell.clients import ClusterClient, InstanceClient
 
-   quoter = QueryQuoter()
+   args_quoter = ArgsQuoter()
+   query_quoter = QueryQuoter()
 
-   cluster_client = ClusterClient(cluster_executor, quoter)
-   instance_client = InstanceClient(instance_executor, quoter)
+   cluster_client = ClusterClient(cluster_executor, args_quoter)
+   instance_client = InstanceClient(instance_executor, query_quoter)
    ```
 
 ## 🔧 Development
