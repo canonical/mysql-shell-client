@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Added
-- Update router config to ClusterInstance class.
+- Update router config to ClusterClient class.
 
 ## [1.0.0][changes-1.0.0] - 2026-05-26
 ### Added

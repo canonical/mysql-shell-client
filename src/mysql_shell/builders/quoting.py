@@ -6,10 +6,10 @@ from typing import Any
 
 
 class ArgsQuoter:
-    """Class to escape and quote MySQL Shell Python input parameters."""
+    """Class to quote MySQL Shell Python input parameters."""
 
-    @cache
-    def quote_value(self, value: Any) -> Any:
+    @staticmethod
+    def quote_value(value: Any) -> Any:
         """Quotes the provided value."""
         if isinstance(value, str):
             return f"'{value}'"
