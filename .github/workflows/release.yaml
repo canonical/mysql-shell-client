@@ -55,6 +55,8 @@ jobs:
           gh release upload "${{ needs.build.outputs.VERSION }}" dist/*.{tar.gz,whl}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
 
   upload-pypi:
     name: "Publish to PyPI"
