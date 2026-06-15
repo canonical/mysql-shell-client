@@ -151,11 +151,40 @@ class TestInstanceClient:
         finally:
             self._delete_user(client, user)
 
+    def test_create_instance_user_without_roles_idempotent(self, client: InstanceClient):
+        """Test the idempotent creation of an instance user without roles."""
+        user = User("instance_user_create_idem", "%")
+
+        try:
+            client.create_instance_user(user, "password", [])
+            client.create_instance_user(user, "password", [])
+            users = client.search_instance_users(user.username)
+            assert len(users) > 0
+        finally:
+            self._delete_user(client, user)
+
     def test_create_instance_user_with_roles(self, client: InstanceClient):
         """Test the creation of an instance user."""
         user = User("instance_user_create", "%")
 
         try:
+            client.create_instance_user(user, "password", ["root"])
+
+            users = client.search_instance_users(user.username)
+            assert len(users) > 0
+
+            roles_granted = self._get_granted_roles(client, user)
+            assert len(roles_granted) > 0
+            assert roles_granted[0] == "root"
+        finally:
+            self._delete_user(client, user)
+
+    def test_create_instance_user_with_roles_idempotent(self, client: InstanceClient):
+        """Test the idempotent creation of an instance user with roles."""
+        user = User("instance_user_create_idem", "%")
+
+        try:
+            client.create_instance_user(user, "password", ["root"])
             client.create_instance_user(user, "password", ["root"])
 
             users = client.search_instance_users(user.username)

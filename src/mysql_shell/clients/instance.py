@@ -100,7 +100,8 @@ class InstanceClient:
             )
 
         creation_query = (
-            "CREATE USER {username}@{hostname} IDENTIFIED BY {password} ATTRIBUTE {attrs}"
+            "CREATE USER IF NOT EXISTS {username}@{hostname} "
+            "IDENTIFIED BY {password} ATTRIBUTE {attrs}"
         )
         creation_query = creation_query.format(
             username=self._quoter.quote_identifier(user.username),
