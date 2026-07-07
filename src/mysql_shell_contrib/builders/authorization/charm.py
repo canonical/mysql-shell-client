@@ -1,8 +1,8 @@
-# Copyright 2025 Canonical Ltd.
+# Copyright 2026 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-from ..quoting import QueryQuoter
-from .base import BaseAuthorizationQueryBuilder
+from mysql_shell.builders.authorization import BaseAuthorizationQueryBuilder
+from mysql_shell.builders.quoting import QueryQuoter
 
 
 class CharmAuthorizationQueryBuilder(BaseAuthorizationQueryBuilder):

@@ -1,11 +1,11 @@
-# Copyright 2025 Canonical Ltd.
+# Copyright 2026 Canonical Ltd.
 # See LICENSE file for licensing details.
 
 from typing import Sequence
 
-from ...models import LogType
-from ..quoting import QueryQuoter
-from .base import BaseLoggingQueryBuilder
+from mysql_shell.builders.logging import BaseLoggingQueryBuilder
+from mysql_shell.builders.quoting import QueryQuoter
+from mysql_shell.models.statement import LogType
 
 
 class CharmLoggingQueryBuilder(BaseLoggingQueryBuilder):

@@ -41,31 +41,22 @@ in addition to a set of predefined queries to cover most of the common use-cases
    instance_executor = LocalExecutor(instance_conn, "mysqlsh")
    ```
 
-4. Import and build the query builders **[optional]**:
+4. Import and build the clients:
    ```python
-   from mysql_shell.builders import CharmLockingQueryBuilder
-
-   # This is just an example
-   builder = CharmLockingQueryBuilder("mysql", "locking")
-   query = builder.build_table_creation_query()
-   rows = instance_executor.execute_sql(query)
-   ```
-
-5. Import and build the clients:
-   ```python
-   from mysql_shell.builders.quoting import QueryQuoter
+   from mysql_shell.builders.quoting import ArgsQuoter, QueryQuoter
    from mysql_shell.clients import ClusterClient, InstanceClient
 
-   quoter = QueryQuoter()
+   args_quoter = ArgsQuoter()
+   query_quoter = QueryQuoter()
 
-   cluster_client = ClusterClient(cluster_executor, quoter)
-   instance_client = InstanceClient(instance_executor, quoter)
+   cluster_client = ClusterClient(cluster_executor, args_quoter)
+   instance_client = InstanceClient(instance_executor, query_quoter)
    ```
 
 ## 🔧 Development
 
 ### Dependencies
-In order to install all the development packages:
+In order to install all the required packages:
 
 ```shell
 poetry install --all-extras

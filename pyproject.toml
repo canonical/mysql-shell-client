@@ -8,16 +8,22 @@ description = "Python client for MySQL Shell"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 readme = "README.md"
-version = "0.9.0"
-authors = [
-    { name = "Sinclert Perez", email = "sinclert.perez@canonical.com" }
-]
-maintainers = [
-    { name = "Canonical Data Platform", email = "data-platform@lists.launchpad.net" },
-]
+version = "1.1.0"
+authors = [{ name = "Sinclert Perez", email = "sinclert.perez@canonical.com" }]
+maintainers = [{ name = "Canonical Data Platform", email = "data-platform@lists.launchpad.net" }]
 dependencies = []
 
 [project.optional-dependencies]
+contrib = [
+    "ops>=2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/canonical/mysql-shell-client"
+Issues = "https://github.com/canonical/mysql-shell-client/issues"
+Changelog = "https://github.com/canonical/mysql-shell-client/blob/main/CHANGELOG.md"
+
+[dependency-groups]
 format = [
     "ruff~=0.15",
 ]
@@ -30,12 +36,6 @@ test = [
     "pytest~=9.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/canonical/mysql-shell-client"
-Issues = "https://github.com/canonical/mysql-shell-client/issues"
-Changelog = "https://github.com/canonical/mysql-shell-client/blob/main/CHANGELOG.md"
-
-
 # Testing tools configuration
 [tool.coverage.run]
 branch = true
@@ -44,8 +44,9 @@ branch = true
 show_missing = true
 
 [tool.pytest.ini_options]
-log_cli_level = "INFO"
+addopts = ["--import-mode=importlib"]
 markers = ["unit", "integration"]
+pythonpath = ["tests"]
 
 # Dependency tools configuration
 [tool.poetry]
@@ -53,6 +54,7 @@ requires-poetry = ">=2.0.0"
 package-mode = true
 packages = [
     { include = "mysql_shell", from = "src" },
+    { include = "mysql_shell_contrib", from = "src" },
 ]
 
 # Linting tools configuration

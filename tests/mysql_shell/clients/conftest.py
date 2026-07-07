@@ -6,7 +6,7 @@ from contextlib import suppress
 
 import pytest
 
-from ..helpers import (
+from helpers import (
     TEST_CLUSTER_HOST,
     TEST_CLUSTER_NAME,
     TEST_CLUSTER_PORT,

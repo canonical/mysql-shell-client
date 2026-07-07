@@ -5,18 +5,17 @@ import os
 
 import pytest
 
+from helpers import (
+    TEST_CLUSTER_NAME,
+    build_local_executor,
+    temp_process,
+)
 from mysql_shell.builders import QueryQuoter
 from mysql_shell.clients import InstanceClient
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models.account import Role, User
 from mysql_shell.models.instance import InstanceRole, InstanceState
 from mysql_shell.models.statement import VariableScope
-
-from ..helpers import (
-    TEST_CLUSTER_NAME,
-    build_local_executor,
-    temp_process,
-)
 
 
 @pytest.mark.integration

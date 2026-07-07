@@ -5,8 +5,20 @@ from functools import cache
 from typing import Any
 
 
+class ArgsQuoter:
+    """Class to quote MySQL Shell Python input parameters."""
+
+    @staticmethod
+    def quote_value(value: Any) -> Any:
+        """Quotes the provided value."""
+        if isinstance(value, str):
+            return f"'{value}'"
+        else:
+            return value
+
+
 class QueryQuoter:
-    """Class to escape and quote MySQL query input parameters."""
+    """Class to escape and quote MySQL Shell SQL input parameters."""
 
     @staticmethod
     def escape(value: Any) -> Any:

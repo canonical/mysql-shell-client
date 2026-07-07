@@ -5,14 +5,14 @@ import os
 
 import pytest
 
-from mysql_shell.clients import ClusterClient
-from mysql_shell.executors import LocalExecutor
-
-from ..helpers import (
+from helpers import (
     TEST_CLUSTER_HOST,
     TEST_CLUSTER_NAME,
     build_local_executor,
 )
+from mysql_shell.builders import ArgsQuoter
+from mysql_shell.clients import ClusterClient
+from mysql_shell.executors import LocalExecutor
 
 
 @pytest.mark.integration
@@ -30,7 +30,7 @@ class TestClusterClient:
     @pytest.fixture(scope="class", autouse=True)
     def client(self, executor: LocalExecutor):
         """MySQL Cluster client fixture."""
-        return ClusterClient(executor)
+        return ClusterClient(executor, ArgsQuoter())
 
     @staticmethod
     def _get_member_address(client: ClusterClient) -> str:
