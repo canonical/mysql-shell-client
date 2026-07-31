@@ -67,7 +67,7 @@ class ClusterClient:
             logger.error("Failed to fetch cluster status")
             raise
         else:
-            return json.loads(result)
+            return json.loads(result, strict=False)
 
     def list_cluster_routers(self, cluster_name: str) -> dict:
         """Lists an InnoDB cluster connected MySQL Routers."""
@@ -146,7 +146,7 @@ class ClusterClient:
             logger.error("Failed to fetch cluster set status")
             raise
         else:
-            return json.loads(result)
+            return json.loads(result, strict=False)
 
     def list_cluster_set_routers(self) -> dict:
         """Lists an InnoDB cluster set connected MySQL Routers."""
