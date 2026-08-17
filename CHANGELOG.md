@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Fixed
+- Allows control chars for JSONDecoder for cluster status output
 
 ## [1.1.0][changes-1.1.0] - 2026-06-08
 ### Added
