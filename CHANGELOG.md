@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+
+## [1.1.1][changes-1.1.1] - 2026-08-18
 ### Fixed
 - Allows control chars for JSONDecoder for cluster status output
 
@@ -132,5 +134,6 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 [changes-0.9.0]: https://github.com/canonical/mysql-shell-client/compare/0.8.1...0.9.0
 [changes-1.0.0]: https://github.com/canonical/mysql-shell-client/compare/0.9.0...1.0.0
 [changes-1.1.0]: https://github.com/canonical/mysql-shell-client/compare/1.0.0...1.1.0
+[changes-1.1.1]: https://github.com/canonical/mysql-shell-client/compare/1.1.0...1.1.1
 [docs-changelog]: https://keepachangelog.com/en/1.0.0/
 [docs-semver]: https://semver.org/spec/v2.0.0.html
