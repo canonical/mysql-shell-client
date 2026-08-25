@@ -17,8 +17,11 @@ _Options = Mapping[str, str] | None
 class ClusterClient:
     """Class to encapsulate all cluster operations using MySQL Shell."""
 
-    def __init__(self, executor: BaseExecutor, quoter: ArgsQuoter):
+    def __init__(self, executor: BaseExecutor, quoter: ArgsQuoter | None = None):
         """Initialize the class."""
+        if not quoter:
+            quoter = ArgsQuoter()
+
         self._executor = executor
         self._quoter = quoter
 
