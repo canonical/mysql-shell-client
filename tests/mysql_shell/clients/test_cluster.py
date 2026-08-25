@@ -10,7 +10,6 @@ from helpers import (
     TEST_CLUSTER_NAME,
     build_local_executor,
 )
-from mysql_shell.builders import ArgsQuoter
 from mysql_shell.clients import ClusterClient
 from mysql_shell.executors import LocalExecutor
 
@@ -30,7 +29,7 @@ class TestClusterClient:
     @pytest.fixture(scope="class", autouse=True)
     def client(self, executor: LocalExecutor):
         """MySQL Cluster client fixture."""
-        return ClusterClient(executor, ArgsQuoter())
+        return ClusterClient(executor)
 
     @staticmethod
     def _get_member_address(client: ClusterClient) -> str:
