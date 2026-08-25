@@ -10,7 +10,6 @@ from helpers import (
     build_local_executor,
     temp_process,
 )
-from mysql_shell.builders import QueryQuoter
 from mysql_shell.clients import InstanceClient
 from mysql_shell.executors import LocalExecutor
 from mysql_shell.models.account import Role, User
@@ -33,7 +32,7 @@ class TestInstanceClient:
     @pytest.fixture(scope="class", autouse=True)
     def client(self, executor: LocalExecutor):
         """MySQL Instance client fixture."""
-        return InstanceClient(executor, QueryQuoter())
+        return InstanceClient(executor)
 
     @staticmethod
     def _delete_database(client: InstanceClient, database: str):

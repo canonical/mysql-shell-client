@@ -21,8 +21,11 @@ _Roles = Sequence[str] | None
 class InstanceClient:
     """Class to encapsulate all instance operations using MySQL Shell."""
 
-    def __init__(self, executor: BaseExecutor, quoter: QueryQuoter):
+    def __init__(self, executor: BaseExecutor, quoter: QueryQuoter | None = None):
         """Initialize the class."""
+        if not quoter:
+            quoter = QueryQuoter()
+
         self._executor = executor
         self._quoter = quoter
 
