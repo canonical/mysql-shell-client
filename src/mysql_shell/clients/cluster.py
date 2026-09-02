@@ -3,7 +3,7 @@
 
 import json
 import logging
-from typing import Mapping
+from typing import Any, Mapping
 
 from ..builders import ArgsQuoter
 from ..executors import BaseExecutor
@@ -11,7 +11,7 @@ from ..executors.errors import ExecutionError
 
 logger = logging.getLogger()
 
-_Options = Mapping[str, str] | None
+_Options = Mapping[str, Any] | None
 
 
 class ClusterClient:
