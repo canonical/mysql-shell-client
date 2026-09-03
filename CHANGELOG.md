@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Fixed
+- Rename cluster client methods.
+- Widen cluster client `options` argument type.
 - Allow client classes instantiation without providing quoters.
 
 ## [1.1.1][changes-1.1.1] - 2026-08-18
