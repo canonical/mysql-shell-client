@@ -3,7 +3,7 @@
 
 import json
 import logging
-from typing import Mapping
+from typing import Any, Mapping
 
 from ..builders import ArgsQuoter
 from ..executors import BaseExecutor
@@ -11,7 +11,7 @@ from ..executors.errors import ExecutionError
 
 logger = logging.getLogger()
 
-_Options = Mapping[str, str] | None
+_Options = Mapping[str, Any] | None
 
 
 class ClusterClient:
@@ -247,7 +247,7 @@ class ClusterClient:
             logger.error(f"Failed to rejoin cluster {cluster_name}")
             raise
 
-    def attach_instance_into_cluster(
+    def attach_instance(
         self,
         cluster_name: str,
         instance_host: str,
@@ -271,7 +271,7 @@ class ClusterClient:
             logger.error(f"Failed to attach instance {address} to cluster {cluster_name}")
             raise
 
-    def detach_instance_from_cluster(
+    def detach_instance(
         self,
         cluster_name: str,
         instance_host: str,
@@ -295,13 +295,13 @@ class ClusterClient:
             logger.error(f"Failed to detach instance {address} from cluster {cluster_name}")
             raise
 
-    def force_instance_quorum_into_cluster(
+    def force_instance_quorum(
         self,
         cluster_name: str,
         instance_host: str,
         instance_port: str,
     ) -> None:
-        """Forces and instance quorum into an InnoDB cluster."""
+        """Forces an instance quorum into an InnoDB cluster."""
         address = f"{instance_host}:{instance_port}"
         command = f"\n".join((
             f"cluster = dba.get_cluster('{cluster_name}')",
@@ -315,7 +315,7 @@ class ClusterClient:
             logger.error(f"Failed to force quorum into cluster {cluster_name}")
             raise
 
-    def rejoin_instance_into_cluster(
+    def rejoin_instance(
         self,
         cluster_name: str,
         instance_host: str,
@@ -339,7 +339,7 @@ class ClusterClient:
             logger.error(f"Failed to rejoin instance {address} into cluster {cluster_name}")
             raise
 
-    def check_instance_before_cluster(self, options: _Options = None) -> dict:
+    def check_instance_config(self, options: _Options = None) -> dict:
         """Checks for an instance configuration before joining an InnoDB cluster."""
         if not options:
             options = {}
@@ -361,7 +361,7 @@ class ClusterClient:
         else:
             return json.loads(result)
 
-    def setup_instance_before_cluster(self, options: _Options = None) -> None:
+    def setup_instance_config(self, options: _Options = None) -> None:
         """Sets up an instance configuration before joining an InnoDB cluster."""
         if not options:
             options = {}
@@ -377,7 +377,7 @@ class ClusterClient:
             logger.error(f"Failed to setup instance {host}:{port} config")
             raise
 
-    def promote_instance_within_cluster(
+    def promote_instance(
         self,
         cluster_name: str,
         instance_host: str,
@@ -405,7 +405,7 @@ class ClusterClient:
             logger.error(f"Failed to make instance {address} the primary")
             raise
 
-    def update_instance_within_cluster(
+    def update_instance(
         self,
         cluster_name: str,
         instance_host: str,
@@ -433,7 +433,7 @@ class ClusterClient:
             logger.error(f"Failed to update instance {address} within cluster {cluster_name}")
             raise
 
-    def remove_router_from_cluster(
+    def remove_router(
         self,
         cluster_name: str,
         router_name: str,
@@ -453,7 +453,7 @@ class ClusterClient:
             logger.error(f"Failed to remove router {router} from cluster {cluster_name}")
             raise
 
-    def update_router_within_cluster(
+    def update_router(
         self,
         cluster_name: str,
         router_name: str,

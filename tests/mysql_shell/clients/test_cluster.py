@@ -56,42 +56,42 @@ class TestClusterClient:
         routers = routers["routers"]
         assert len(routers) == 0
 
-    def test_check_instance_before_cluster(self, client: ClusterClient):
+    def test_check_instance_config(self, client: ClusterClient):
         """Test the checking of an instance config before joining a cluster."""
-        result = client.check_instance_before_cluster()
+        result = client.check_instance_config()
         assert result["status"] == "ok"
 
-    def test_promote_instance_within_cluster(self, client: ClusterClient):
+    def test_promote_instance(self, client: ClusterClient):
         """Test the promotion of an instance within a cluster."""
         status = client.fetch_cluster_status(TEST_CLUSTER_NAME)
         primary = status.get("defaultReplicaSet", {}).get("primary", "")
         assert primary.endswith("3306")
 
-        client.promote_instance_within_cluster(TEST_CLUSTER_NAME, TEST_CLUSTER_HOST, "3307")
+        client.promote_instance(TEST_CLUSTER_NAME, TEST_CLUSTER_HOST, "3307")
 
         status = client.fetch_cluster_status(TEST_CLUSTER_NAME)
         primary = status.get("defaultReplicaSet", {}).get("primary", "")
         assert primary.endswith("3307")
 
-        client.promote_instance_within_cluster(TEST_CLUSTER_NAME, TEST_CLUSTER_HOST, "3306")
+        client.promote_instance(TEST_CLUSTER_NAME, TEST_CLUSTER_HOST, "3306")
 
         status = client.fetch_cluster_status(TEST_CLUSTER_NAME)
         primary = status.get("defaultReplicaSet", {}).get("primary", "")
         assert primary.endswith("3306")
 
-    def test_update_instance_within_cluster(self, client: ClusterClient):
+    def test_update_instance(self, client: ClusterClient):
         """Test the updating an instance config within a cluster."""
         address = self._get_member_address(client)
 
         try:
-            client.update_instance_within_cluster(
+            client.update_instance(
                 cluster_name=TEST_CLUSTER_NAME,
                 instance_host="0.0.0.0",
                 instance_port="3306",
                 options={"label": "mysql-0"},
             )
         finally:
-            client.update_instance_within_cluster(
+            client.update_instance(
                 cluster_name=TEST_CLUSTER_NAME,
                 instance_host="0.0.0.0",
                 instance_port="3306",
