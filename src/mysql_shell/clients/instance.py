@@ -137,8 +137,11 @@ class InstanceClient:
             logger.error(f"Failed to delete instance user {user.username}.{user.hostname}")
             raise
 
-    def delete_instance_users(self, users: list[User]) -> None:
+    def delete_instance_users(self, users: Sequence[User]) -> None:
         """Deletes the instance users provided."""
+        if not users:
+            return
+
         query = "DROP USER IF EXISTS {username}@{hostname}"
         queries = []
 

@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 ## Unreleased
 ### Fixed
+- Safeguard instance client `delete_instance_users` method.
 - Rename cluster client methods.
 - Widen cluster client `options` argument type.
 - Allow client classes instantiation without providing quoters.
