@@ -7,6 +7,9 @@ from abc import ABC, abstractmethod
 class BaseLockingQueryBuilder(ABC):
     """Base class for all the locking query builders."""
 
+    INSTANCE_ADDITION_TASK: str
+    INSTANCE_REMOVAL_TASK: str
+
     @abstractmethod
     def build_table_creation_query(self) -> str:
         """Builds the locking table creation query."""
