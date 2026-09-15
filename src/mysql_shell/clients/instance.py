@@ -402,28 +402,19 @@ class InstanceClient:
         if roles and states:
             raise ValueError("Only one of the properties must be provided")
 
-        roles_filter = "(member_role IN ({roles}))"
-        states_filter = "(member_state IN ({states}))"
-
         if not roles:
-            roles = list(InstanceRole)
-            roles_filter = "(member_role IN ({roles}) OR member_role = '')"
+            roles = list(InstanceRole) + [""]
         if not states:
-            states = list(InstanceState)
-            states_filter = "(member_state IN ({states}) OR member_state = '')"
+            states = list(InstanceState) + [""]
 
         query = (
             "SELECT member_id "
             "FROM performance_schema.replication_group_members "
-            "WHERE {roles_filter} AND {states_filter}"
+            "WHERE member_role IN ({roles}) AND member_state IN ({states})"
         )
         query = query.format(
-            roles_filter=roles_filter.format(
-                roles=", ".join([self._quoter.quote_value(role) for role in roles]),
-            ),
-            states_filter=states_filter.format(
-                states=", ".join([self._quoter.quote_value(state) for state in states]),
-            ),
+            roles=", ".join([self._quoter.quote_value(role) for role in roles]),
+            states=", ".join([self._quoter.quote_value(state) for state in states]),
         )
 
         try:
