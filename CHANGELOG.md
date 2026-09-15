@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+
+## [2.0.0][changes-2.0.0] - 2026-09-16
 ### Fixed
 - Safeguard instance client `delete_instance_users` method.
 - Rename cluster client methods.
@@ -140,5 +142,6 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 [changes-1.0.0]: https://github.com/canonical/mysql-shell-client/compare/0.9.0...1.0.0
 [changes-1.1.0]: https://github.com/canonical/mysql-shell-client/compare/1.0.0...1.1.0
 [changes-1.1.1]: https://github.com/canonical/mysql-shell-client/compare/1.1.0...1.1.1
+[changes-2.0.0]: https://github.com/canonical/mysql-shell-client/compare/1.1.1...2.0.0
 [docs-changelog]: https://keepachangelog.com/en/1.0.0/
 [docs-semver]: https://semver.org/spec/v2.0.0.html
