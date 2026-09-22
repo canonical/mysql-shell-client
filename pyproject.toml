@@ -15,7 +15,7 @@ dependencies = []
 
 [project.optional-dependencies]
 contrib = [
-    "ops>=2.0",
+    "ops>=2.23.5",
 ]
 
 [project.urls]

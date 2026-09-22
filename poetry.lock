@@ -225,15 +225,15 @@ typing-extensions = ">=4.5.0"
 
 [[package]]
 name = "ops"
-version = "3.7.0"
+version = "3.8.2"
 description = "The Python library behind great charms"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"contrib\""
 files = [
-    {file = "ops-3.7.0-py3-none-any.whl", hash = "sha256:7050d5e629ac17de9d443e64f4ad09857e8012c9012c8ba66c9e765899d50bd1"},
-    {file = "ops-3.7.0.tar.gz", hash = "sha256:15f04b2fcf1d8bc966cd4405b68a2c71fa24c06f234d5003e89cc4f18ee51a45"},
+    {file = "ops-3.8.2-py3-none-any.whl", hash = "sha256:dcead2241d17921441123425072dd6adddf5f337dc6d6fd2b3ba1fd60a0af822"},
+    {file = "ops-3.8.2.tar.gz", hash = "sha256:a516e76a76fdfd4a37f26f2b9956c332b56bda72014c8565ceb4f6deb137407f"},
 ]
 
 [package.dependencies]
@@ -242,8 +242,8 @@ PyYAML = "==6.*"
 websocket-client = "==1.*"
 
 [package.extras]
-testing = ["ops-scenario (==8.7.0)"]
-tracing = ["ops-tracing (==3.7.0)"]
+testing = ["ops-scenario (==8.8.2)"]
+tracing = ["ops-tracing (==3.8.2)"]
 
 [[package]]
 name = "packaging"
@@ -540,4 +540,4 @@ contrib = ["ops"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "bf1c101f924b32ee55c2156956b8abadc900fa5e34e2bfd8cb14d4ee8f3ef882"
+content-hash = "5ed73700cad2733a148df48bb741080e68f615373063f1c13803d4d2597eae39"
