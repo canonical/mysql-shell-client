@@ -12,6 +12,11 @@ services:
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=127.0.0.1", "--port=3306"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   mysql-2:
     image: "docker.io/mysql:8.4"
@@ -23,6 +28,11 @@ services:
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=127.0.0.1", "--port=3307"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   mysql-3:
     image: "docker.io/mysql:8.4"
@@ -34,3 +44,8 @@ services:
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=127.0.0.1", "--port=3308"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
