@@ -7,8 +7,8 @@
 MySQL Shell is an advanced client for MySQL Server that allow system administrator to perform both
 cluster and instance level operations, using a single binary.
 
-This project provides a Python client to perform the most common set of operations,
-in addition to a set of predefined queries to cover most of the common use-cases.
+This project provides a Python client that exposes common operations alongside a
+set of predefined queries to cover typical use-cases.
 
 ## 🧑‍💻 Usage
 
