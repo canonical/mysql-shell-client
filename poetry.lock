@@ -506,4 +506,4 @@ contrib = ["ops"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "bf1c101f924b32ee55c2156956b8abadc900fa5e34e2bfd8cb14d4ee8f3ef882"
+content-hash = "591df53d5be6c09b25d20b47891a963f3c6cee2c55bb5a0d42a1191de518a5dc"
