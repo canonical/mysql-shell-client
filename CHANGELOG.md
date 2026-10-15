@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog][docs-changelog], and the version adher
 
 
 ## Unreleased
+### Fixed
+- Extend cluster status list to include `INVALIDATED`.
 
 ## [2.0.0][changes-2.0.0] - 2026-09-16
 ### Fixed
