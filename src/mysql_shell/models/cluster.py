@@ -41,7 +41,8 @@ class ClusterStatus(str, Enum):
     """MySQL cluster statuses.
 
     There is a slight discrepancy between the possible cluster statuses reported
-    on different MySQL documentation pages, this list contains the common ones across them.
+    on different MySQL documentation pages, due to outdated documentation.
+    This list contains the common ones across them + INVALIDATED.
     - https://dev.mysql.com/doc/mysql-shell/8.0/en/innodb-clusterset-status.html
     - https://dev.mysql.com/doc/mysql-shell/8.0/en/monitoring-innodb-cluster.html
     """
@@ -53,5 +54,6 @@ class ClusterStatus(str, Enum):
     NO_QUORUM = "NO_QUORUM"
     OFFLINE = "OFFLINE"
     ERROR = "ERROR"
-    UNREACHABLE = "UNREACHABLE"
     UNKNOWN = "UNKNOWN"
+    UNREACHABLE = "UNREACHABLE"
+    INVALIDATED = "INVALIDATED"
