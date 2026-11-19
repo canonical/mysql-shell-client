@@ -8,7 +8,9 @@ on:
 jobs:
   build:
     name: "Build package"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     outputs:
       VERSION: ${{ steps.export.outputs.VERSION }}
     steps:
@@ -16,6 +18,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: "Install poetry"
         run: pipx install poetry
       - name: "Export package information"
@@ -38,10 +41,14 @@ jobs:
   upload-github:
     name: "Publish to GitHub"
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: "Download all the dists"
         uses: actions/download-artifact@v8
         with:
@@ -49,19 +56,20 @@ jobs:
           path: dist/
       - name: "Create GitHub release"
         run: |
-          git tag "${{ needs.build.outputs.VERSION }}"
-          git push origin "${{ needs.build.outputs.VERSION }}"
-          gh release create "${{ needs.build.outputs.VERSION }}" --generate-notes --title "${{ needs.build.outputs.VERSION }}"
-          gh release upload "${{ needs.build.outputs.VERSION }}" dist/*.{tar.gz,whl}
+          git tag "${VERSION}"
+          git push origin "${VERSION}"
+          gh release create "${VERSION}" --generate-notes --title "${VERSION}"
+          gh release upload "${VERSION}" dist/*.{tar.gz,whl}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    permissions:
-      contents: write
+          VERSION: ${{ needs.build.outputs.VERSION }}
 
   upload-pypi:
     name: "Publish to PyPI"
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
     steps:
       - name: "Download all the dists"
         uses: actions/download-artifact@v8
@@ -70,5 +78,3 @@ jobs:
           path: dist/
       - name: "Publish to PyPI"
         uses: pypa/gh-action-pypi-publish@release/v1
-    permissions:
-      id-token: write
