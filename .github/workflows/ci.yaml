@@ -15,6 +15,12 @@ on:
       - main
 
 jobs:
+  lint-workflows:
+    name: "Lint workflows"
+    uses: canonical/data-platform-workflows/.github/workflows/lint_workflows.yaml@v56
+    permissions:
+      contents: read
+
   lint:
     name: "Lint"
     runs-on: ubuntu-latest
@@ -23,6 +29,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: "Install binaries"
         run: |
           sudo apt update
@@ -46,6 +54,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: "Install binaries"
         run: |
           sudo apt update
@@ -88,6 +98,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: "Set up Compose"
         uses: docker/setup-compose-action@v2
       - name: "Set up Python"
