@@ -15,12 +15,22 @@ on:
       - main
 
 jobs:
+  lint-workflows:
+    name: "Lint workflows"
+    uses: canonical/data-platform-workflows/.github/workflows/lint_workflows.yaml@v56
+    permissions:
+      contents: read
+
   lint:
     name: "Lint"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: "Install binaries"
         run: |
           sudo apt update
@@ -38,10 +48,14 @@ jobs:
 
   test-unit:
     name: "Run unit tests"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: "Install binaries"
         run: |
           sudo apt update
@@ -61,7 +75,9 @@ jobs:
 
   test-integration:
     name: "Run integration tests"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -82,6 +98,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: "Set up Compose"
         uses: docker/setup-compose-action@v2
       - name: "Set up Python"
